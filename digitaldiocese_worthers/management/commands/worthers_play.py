@@ -8,7 +8,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         worthers = Worthers(options['api_id'], options['api_key'], options['diocese_id'])
-        pprint.pprint(worthers.get_contacts(limit=1))
+        result = worthers.get_contacts(
+            limit=1, search_params={'keyword': 'smith', 'keyword_names_only': 'on'}
+        )
+        pprint.pprint(result)
 
     def add_arguments(self, parser):
         parser.add_argument('api_id')

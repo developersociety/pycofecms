@@ -8,7 +8,7 @@ import datetime
 class WorthersTest(TestCase):
 
     def setUp(self):
-        self.worthers = Worthers(api_id='test_api_id', api_key='test_api_key')
+        self.worthers = Worthers(api_id='test_api_id', api_key='test_api_key', diocese_id=123)
 
     def test_init(self):
         worthers = Worthers(api_id='test_api_id', api_key='test_api_key')
@@ -33,13 +33,13 @@ class WorthersTest(TestCase):
         self.assertEqual(result, 'https://cmsapi.cofeportal.org/v2/contacts')
 
     def test_generate_request_params(self):
-        encode_data_return = '{"wibble": "wobble"}'
-        self.worthers.encode_data = mock.Mock(spec=self.worthers.encode_data)
-        self.worthers.encode_data.return_value = encode_data_return
+        encode_search_params_return = '{"wibble": "wobble"}'
+        self.worthers.encode_search_params = mock.Mock(spec=self.worthers.encode_search_params)
+        self.worthers.encode_search_params.return_value = encode_search_params_return
 
         prepare_extra_params_return = {'an_extra_param': 'param_value'}
-        self.worthers._prepare_extra_params = mock.Mock(spec=self.worthers._prepare_extra_params)
-        self.worthers._prepare_extra_params.return_value = prepare_extra_params_return
+        self.worthers._prepare_basic_params = mock.Mock(spec=self.worthers._prepare_basic_params)
+        self.worthers._prepare_basic_params.return_value = prepare_extra_params_return
 
         generate_signature_return = (
             '63f00f7c1a63b52d235d9c59cfcf14e2a5a85b09c896ffcb59087c334c042a05'
@@ -52,31 +52,31 @@ class WorthersTest(TestCase):
         )
 
         expected_result = {
-            'api_id': 'test_api_id', 'data': encode_data_return, 'sig': generate_signature_return,
-            'an_extra_param': 'param_value',
+            'api_id': 'test_api_id', 'data': encode_search_params_return,
+            'sig': generate_signature_return, 'an_extra_param': 'param_value',
         }
         self.assertEqual(result, expected_result)
         self.worthers.generate_signature.assert_called_once_with(
-            encode_data_return, an_extra_param='param_value',
+            encode_search_params_return, an_extra_param='param_value',
         )
-        self.worthers._prepare_extra_params.assert_called_once_with(
+        self.worthers._prepare_basic_params.assert_called_once_with(
             {'an_extra_param': 'param_value'}
         )
 
-    def test__prepare_extra_params__remove_nones(self):
+    def test__prepare_basic_params__remove_nones(self):
         params = {'good': 'good_value', 'none_value': None}
-        result = self.worthers._prepare_extra_params(params)
+        result = self.worthers._prepare_basic_params(params)
 
         expected_result = {'good': 'good_value'}
         self.assertEqual(result, expected_result)
 
-    def test__prepare_extra_params__format_dates(self):
+    def test__prepare_basic_params__format_dates(self):
         params = {
             'good': 'good_value',
             'start_date': datetime.datetime(2017, 6, 9, 22, 30, 15),
             'end_date': datetime.datetime(2017, 8, 2, 9, 5, 1),
         }
-        result = self.worthers._prepare_extra_params(params)
+        result = self.worthers._prepare_basic_params(params)
 
         expected_result = {
             'good': 'good_value', 'start_date': '2017-06-09 22:30', 'end_date': '2017-08-02 09:05'
@@ -87,8 +87,8 @@ class WorthersTest(TestCase):
         result = self.worthers.format_date(datetime.datetime(2017, 6, 9, 22, 30, 15))
         self.assertEqual(result, '2017-06-09 22:30')
 
-    def test_encode_data(self):
-        result = self.worthers.encode_data({'w i"b#b&le': 'w"o\'b&b[l/e'})
+    def test_encode_search_params(self):
+        result = self.worthers.encode_search_params({'w i"b#b&le': 'w"o\'b&b[l/e'})
         self.assertEqual(
             result, '{"w i\\"b#b&le": "w\\"o\'b&b[l/e"}'
         )
@@ -102,12 +102,18 @@ class WorthersTest(TestCase):
     def test_get_contacts(self):
         pass
 
-    def test__generate_default_data(self):
-        result = self.worthers._generate_default_data(456)
+    def test__prepare_search_params(self):
+        search_params = {'some_search_param': 'some_value'}
+        result = self.worthers._prepare_search_params(search_params)
+
+        expected_result = {'some_search_param': 'some_value', 'diocese_id': 123}
+        self.assertEqual(result, expected_result)
+
+        result = self.worthers._prepare_search_params({}, 456)
         self.assertEqual(result, {'diocese_id': 456})
 
         self.worthers.diocese_id = 789
-        result = self.worthers._generate_default_data()
+        result = self.worthers._prepare_search_params({})
         self.assertEqual(result, {'diocese_id': 789})
 
     def test_do_request(self):
