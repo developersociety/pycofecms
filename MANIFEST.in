@@ -1,0 +1,5 @@
+recursive-include digitaldiocese_worthers *.py
+recursive-include digitaldiocese_worthers/static/css *.css *.less
+recursive-include digitaldiocese_worthers/static/img *.jpg *.png
+recursive-include digitaldiocese_worthers/static/js *.js
+recursive-include digitaldiocese_worthers/templates *.html *.txt
