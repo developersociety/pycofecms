@@ -33,13 +33,18 @@ class Worthers(object):
         self._diocese_id = value
 
     def get_contacts(
-        self, diocese_id=None, end_date=None, fields=None, limit=None, offset=None,
-        start_date=None, search_params=None,
+        self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
+        offset=None, start_date=None,
     ):
         """
         https://cmsapi.cofeportal.org/get-contacts
         """
         endpoint_url = self.generate_endpoint_url('/v2/contacts')
+        result = self.get(
+            endpoint_url, diocese_id, search_params, end_date=end_date, fields=fields, limit=limit,
+            offset=offset, start_date=start_date
+        )
+        return result
 
         prepared_search_params = self._prepare_search_params(
             search_params or {}, diocese_id=diocese_id
@@ -50,6 +55,21 @@ class Worthers(object):
             start_date=start_date,
         )
 
+        result = self.do_request(endpoint_url, request_params)
+        return result
+
+    def get_contact(self, contact_id, diocese_id=None):
+        """
+        https://cmsapi.cofeportal.org/get-contacts-id
+        """
+        endpoint_url = self.generate_endpoint_url('/v2/contacts/{}'.format(contact_id))
+        result = self.get(endpoint_url, diocese_id)
+        return result
+
+    def get(self, endpoint_url, diocese_id=None, search_params=None, **basic_params):
+        search_params = search_params or {}
+        prepared_search_params = self._prepare_search_params(search_params, diocese_id=diocese_id)
+        request_params = self.generate_request_params(prepared_search_params, **basic_params)
         result = self.do_request(endpoint_url, request_params)
         return result
 
