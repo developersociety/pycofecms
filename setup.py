@@ -12,5 +12,6 @@ setup(
     include_package_data=True,
     install_requires=[
         'django-digitaldiocese>=1.5.0',
+        'requests>=2.0.0',
     ],
 )

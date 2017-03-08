@@ -1,0 +1,1 @@
+default_app_config = 'digitaldiocese_worthers.apps.DigitalDioceseWorthersConfig'
