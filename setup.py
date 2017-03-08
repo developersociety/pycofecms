@@ -1,16 +1,16 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='django-digitaldiocese',
+    name='django-digitaldiocese-worthers',
     packages=find_packages(),
-    version='1.5.8',
+    version='0.0.1',
     author='Blanc Ltd',
     author_email='studio@blanc.ltd.uk',
-    description='Handbook',
+    description='Enables Worthers integration for Digital Diocese',
     license='BSD',
-    url='https://github.com/blancltd/django-digitaldiocese',
+    url='https://github.com/blancltd/django-digitaldiocese-worthers',
     include_package_data=True,
     install_requires=[
-        'tqdm>=4.9.0',
+        'django-digitaldiocese>=1.5.0',
     ],
 )
