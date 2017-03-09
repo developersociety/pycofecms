@@ -1,8 +1,9 @@
 from unittest import TestCase, mock
 
-from digitaldiocese_worthers.api2 import Worthers
+from digitaldiocese_worthers.api2 import Worthers, WorthersResult
 import requests
 import datetime
+import httpretty
 
 
 class WorthersTest(TestCase):
@@ -35,13 +36,13 @@ class WorthersTest(TestCase):
         )
 
         get_return = [{'wibble': 'wobble'}]
-        self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
+        self.worthers.paged_get = mock.Mock(spec=self.worthers.paged_get, return_value=get_return)
 
         result = self.worthers.get_contacts()
 
         self.assertEqual(result, get_return)
         self.worthers.generate_endpoint_url.assert_called_once_with('/v2/contacts')
-        self.worthers.get.assert_called_once_with(
+        self.worthers.paged_get.assert_called_once_with(
             endpoint_url, diocese_id=None, search_params=None, end_date=None, fields=None,
             limit=None, offset=None, start_date=None,
         )
@@ -53,7 +54,7 @@ class WorthersTest(TestCase):
         )
 
         get_return = [{'wibble': 'wobble'}]
-        self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
+        self.worthers.paged_get = mock.Mock(spec=self.worthers.paged_get, return_value=get_return)
 
         end_date = datetime.datetime.now()
         start_date = datetime.datetime.now()
@@ -64,7 +65,7 @@ class WorthersTest(TestCase):
 
         self.assertEqual(result, get_return)
         self.worthers.generate_endpoint_url.assert_called_once_with('/v2/contacts')
-        self.worthers.get.assert_called_once_with(
+        self.worthers.paged_get.assert_called_once_with(
             endpoint_url, diocese_id=123, search_params={'some_key': 'some_value'},
             end_date=end_date, fields={'contact': ['surname']}, limit=10, offset=50,
             start_date=start_date,
@@ -77,13 +78,13 @@ class WorthersTest(TestCase):
         )
 
         get_return = [{'wibble': 'wobble'}]
-        self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
+        self.worthers.paged_get = mock.Mock(spec=self.worthers.get, return_value=get_return)
 
         result = self.worthers.get_contact(123)
 
         self.assertEqual(result, get_return)
         self.worthers.generate_endpoint_url.assert_called_once_with('/v2/contacts/123')
-        self.worthers.get.assert_called_once_with(endpoint_url=endpoint_url, diocese_id=None)
+        self.worthers.paged_get.assert_called_once_with(endpoint_url=endpoint_url, diocese_id=None)
 
     def test_get_deleted_contacts(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts/deleted'
@@ -92,13 +93,13 @@ class WorthersTest(TestCase):
         )
 
         get_return = [{'wibble': 'wobble'}]
-        self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
+        self.worthers.paged_get = mock.Mock(spec=self.worthers.get, return_value=get_return)
 
         result = self.worthers.get_deleted_contacts(diocese_id=123, offset=50)
 
         self.assertEqual(result, get_return)
         self.worthers.generate_endpoint_url.assert_called_once_with('/v2/contacts/deleted')
-        self.worthers.get.assert_called_once_with(
+        self.worthers.paged_get.assert_called_once_with(
             endpoint_url=endpoint_url, diocese_id=123, search_params=None, end_date=None,
             fields=None, limit=None, offset=50, start_date=None
         )
@@ -118,15 +119,20 @@ class WorthersTest(TestCase):
         self.worthers.generate_endpoint_url.assert_called_once_with('/v2/contact-fields')
         self.worthers.get.assert_called_once_with(endpoint_url=endpoint_url, diocese_id=123)
 
-    def test_get(self):
+    def test_get__list_response(self):
         request_params = {'api_id': 'some_api_id', 'data': '{"json_key": "json_value"}'}
         self.worthers.generate_request_params = mock.Mock(
             spec=self.worthers.generate_request_params, return_value=request_params,
         )
 
-        request_return = [{'key': 'value'}]
+        headers = {
+            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59'
+        }
+        mock_response = mock.Mock(spec=requests.Response)
+        mock_response.headers = headers
+        mock_response.json.return_value = [{'some_key': 'some_value'}]
         self.worthers.do_request = mock.Mock(
-            spec=self.worthers.do_request, return_value=request_return
+            spec=self.worthers.do_request, return_value=mock_response
         )
 
         result = self.worthers.get(
@@ -134,13 +140,90 @@ class WorthersTest(TestCase):
             search_params={'postcode': 'cv1 1aa'}, wibble='wobble', limit=10,
         )
 
-        self.assertEqual(result, request_return)
+        self.assertEqual(result, [{'some_key': 'some_value'}])
+
+        self.assertEqual(result.headers, headers)
+        self.assertEqual(result.rate_limit, 60)
+        self.assertEqual(result.rate_limit_remaining, 59)
+        self.assertEqual(result.response, mock_response)
+        self.assertEqual(result.endpoint_url, 'https://cmsapi.cofeportal.org/v2/some_end_point')
+        self.assertEqual(result.diocese_id, 123)
+        self.assertEqual(result.search_params, {'postcode': 'cv1 1aa'})
+        self.assertEqual(result.basic_params, {'wibble': 'wobble', 'limit': 10})
+
         self.worthers.generate_request_params.assert_called_once_with(
             diocese_id=123, search_params={'postcode': 'cv1 1aa'}, wibble='wobble', limit=10,
         )
         self.worthers.do_request.assert_called_once_with(
             endpoint_url='https://cmsapi.cofeportal.org/v2/some_end_point',
             request_params=request_params,
+        )
+
+    def test_get__dict_response(self):
+        request_params = {'api_id': 'some_api_id', 'data': '{"json_key": "json_value"}'}
+        self.worthers.generate_request_params = mock.Mock(
+            spec=self.worthers.generate_request_params, return_value=request_params,
+        )
+
+        headers = {
+            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59'
+        }
+        mock_response = mock.Mock(spec=requests.Response)
+        mock_response.headers = headers
+        mock_response.json.return_value = {'a_list': ['some_value']}
+        self.worthers.do_request = mock.Mock(
+            spec=self.worthers.do_request, return_value=mock_response
+        )
+
+        result = self.worthers.get(
+            'https://cmsapi.cofeportal.org/v2/some_end_point', diocese_id=123,
+            search_params={'postcode': 'cv1 1aa'}, wibble='wobble', limit=10,
+        )
+
+        self.assertEqual(result, [{'a_list': ['some_value']}])
+        self.assertEqual(result.response, mock_response)
+        self.worthers.generate_request_params.assert_called_once_with(
+            diocese_id=123, search_params={'postcode': 'cv1 1aa'}, wibble='wobble', limit=10,
+        )
+        self.worthers.do_request.assert_called_once_with(
+            endpoint_url='https://cmsapi.cofeportal.org/v2/some_end_point',
+            request_params=request_params,
+        )
+
+    def test_paged_get(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts'
+
+        get_return = WorthersResult([{'contact': ['id', 'surname']}])
+        get_return.headers = {
+            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59'
+        }
+        self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
+
+        result = self.worthers.paged_get(endpoint_url=endpoint_url, diocese_id=123)
+
+        self.assertEqual(result, get_return)
+        self.assertEqual(result.total_count, 678)
+        self.assertEqual(result.offset, 0)
+        self.worthers.get.assert_called_once_with(
+            endpoint_url=endpoint_url, diocese_id=123, search_params=None, offset=0
+        )
+
+    def test_paged_get__with_offset(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts'
+
+        get_return = WorthersResult([{'contact': ['id', 'surname']}])
+        get_return.headers = {
+            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59'
+        }
+        self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
+
+        result = self.worthers.paged_get(endpoint_url=endpoint_url, diocese_id=123, offset=100)
+
+        self.assertEqual(result, get_return)
+        self.assertEqual(result.total_count, 678)
+        self.assertEqual(result.offset, 100)
+        self.worthers.get.assert_called_once_with(
+            endpoint_url=endpoint_url, diocese_id=123, search_params=None, offset=100
         )
 
     def test_make_endpoint_url(self):
@@ -242,54 +325,24 @@ class WorthersTest(TestCase):
         result = self.worthers._prepare_search_params()
         self.assertEqual(result, {'diocese_id': 789})
 
+    @httpretty.activate
     def test_do_request(self):
         mock_session = mock.Mock(spec=requests.Session)
         self.worthers._get_session = mock.Mock(spec=self.worthers._get_session)
         self.worthers._get_session.return_value = mock_session
 
-        expected_data = [{'some_key': 'some value'}]
-        self.worthers._get_as_json = mock.Mock(spec=self.worthers._get_as_json)
-        self.worthers._get_as_json.return_value = expected_data
+        mock_response = mock.Mock(spec=requests.Response)
+        mock_session.get.return_value = mock_response
 
         endpoint_url = 'http://example.com/endpoint'
         request_params = {'wibble': 'wobble'}
 
         result = self.worthers.do_request(endpoint_url, request_params)
 
-        self.assertEqual(result, expected_data)
-        self.worthers._get_as_json.assert_called_once_with(
-            mock_session, endpoint_url, request_params
-        )
-
-    def test__get_as_json(self):
-        expected_data = [{'some_key': 'some value'}]
-
-        mock_response = mock.Mock(spec=requests.Response)
-        mock_response.json.return_value = expected_data
-        session = mock.Mock(spec=requests.Session)
-        session.get.return_value = mock_response
-
-        endpoint_url = 'http://example.com/endpoint'
-        request_params = {'wibble': 'wobble'}
-
-        result = self.worthers._get_as_json(session, endpoint_url, request_params)
-
-        self.assertEqual(result, expected_data)
-        session.get.assert_called_once_with(endpoint_url, params=request_params)
+        self.assertEqual(result, mock_response)
+        self.worthers._get_session.assert_called_once_with()
+        mock_session.get.assert_called_once_with(endpoint_url, params=request_params)
         mock_response.raise_for_status.assert_called_once_with()
-        mock_response.json.assert_called_once_with()
-
-    def test__get_as_json__exceptions(self):
-        mock_response = mock.Mock(spec=requests.Response)
-        mock_response.raise_for_status.side_effect = requests.HTTPError
-        session = mock.Mock(spec=requests.Session)
-        session.get.return_value = mock_response
-
-        endpoint_url = 'http://example.com/endpoint'
-        request_params = {'wibble': 'wobble'}
-
-        with self.assertRaises(requests.HTTPError):
-            self.worthers._get_as_json(session, endpoint_url, request_params)
 
     def test__get_session(self):
         self.assertIsNone(self.worthers.session)
@@ -299,3 +352,27 @@ class WorthersTest(TestCase):
 
         session_2 = self.worthers._get_session()
         self.assertEqual(session, session_2)
+
+
+class WorthersResultTest(TestCase):
+
+    def test_init(self):
+        result_page = WorthersResult([1, 2, 3])
+        self.assertEqual(result_page, [1, 2, 3])
+
+    def test_works_as_list(self):
+        result_page = WorthersResult()
+        result_page.append('wibble')
+        result_page.append('wobble')
+        self.assertEqual(result_page, ['wibble', 'wobble'])
+        self.assertIn('wibble', result_page)
+        self.assertIn('wobble', result_page)
+
+        pop_result = result_page.pop()
+        self.assertEqual(pop_result, 'wobble')
+        self.assertEqual(result_page, ['wibble'])
+
+    def test_getattr(self):
+        result_page = WorthersResult()
+        result_page.some_attr = 'wibble'
+        self.assertEqual(result_page.some_attr, 'wibble')

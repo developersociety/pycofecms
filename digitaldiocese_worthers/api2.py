@@ -40,7 +40,7 @@ class Worthers(object):
         https://cmsapi.cofeportal.org/get-contacts
         """
         endpoint_url = self.generate_endpoint_url('/v2/contacts')
-        result = self.get(
+        result = self.paged_get(
             endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
             end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date
         )
@@ -51,7 +51,7 @@ class Worthers(object):
         https://cmsapi.cofeportal.org/get-contacts-id
         """
         endpoint_url = self.generate_endpoint_url('/v2/contacts/{}'.format(contact_id))
-        result = self.get(endpoint_url, diocese_id)
+        result = self.paged_get(endpoint_url, diocese_id)
         return result
 
     def get_deleted_contacts(
@@ -59,7 +59,7 @@ class Worthers(object):
         offset=None, start_date=None
     ):
         endpoint_url = self.generate_endpoint_url('/v2/contacts/deleted')
-        result = self.get(
+        result = self.paged_get(
             endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
             end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
         )
@@ -72,12 +72,37 @@ class Worthers(object):
 
     def get(self, endpoint_url, diocese_id=None, search_params=None, **basic_params):
         request_params = self.generate_request_params(diocese_id, search_params, **basic_params)
-        result = self.do_request(endpoint_url, request_params)
+        response = self.do_request(endpoint_url, request_params)
+
+        from_json = response.json()
+
+        # Sometimes the response is a dict, but we want it to be a list of dicts
+        if isinstance(from_json, dict):
+            from_json = [from_json]
+
+        result = WorthersResult(from_json)
+        result.response = response
+        result.headers = response.headers
+        result.endpoint_url = endpoint_url
+        result.diocese_id = diocese_id
+        result.search_params = search_params
+        result.basic_params = basic_params
+        result.rate_limit = int(response.headers['X-Rate-Limit'])
+        result.rate_limit_remaining = int(response.headers['X-Rate-Limit-Remaining'])
+        return result
+
+    def paged_get(self, endpoint_url, diocese_id=None, search_params=None, **basic_params):
+        basic_params['offset'] = basic_params.get('offset', 0)
+        result = self.get(endpoint_url, diocese_id, search_params, **basic_params)
+        result.total_count = int(result.headers['X-Total-Count'])
+        result.offset = basic_params['offset']
         return result
 
     def do_request(self, endpoint_url, request_params):
         session = self._get_session()
-        return self._get_as_json(session, endpoint_url, request_params)
+        result = session.get(endpoint_url, params=request_params)
+        result.raise_for_status()
+        return result
 
     def generate_endpoint_url(self, endpoint):
         endpoint_url = '{base_url}{endpoint}'.format(base_url=Worthers.BASE_URL, endpoint=endpoint)
@@ -141,14 +166,6 @@ class Worthers(object):
         search_params['diocese_id'] = diocese_id
         return search_params
 
-    def _get_as_json(self, session, endpoint_url, request_params):
-        """
-        Use the supplied session to run a get request and return the decoded JSON data.
-        """
-        result = session.get(endpoint_url, params=request_params)
-        result.raise_for_status()
-        return result.json()
-
     def _get_session(self):
         """
         Returns a the current requests session.
@@ -178,3 +195,15 @@ class Worthers(object):
             basic_params_filtered['fields'] = json.dumps(basic_params_filtered['fields'])
 
         return basic_params_filtered
+
+
+class WorthersResult(list):
+    def __new__(self, *args, **kwargs):
+        return super().__new__(self, args, kwargs)
+
+    def __init__(self, *args, **kwargs):
+        if len(args) == 1 and hasattr(args[0], '__iter__'):
+            list.__init__(self, args[0])
+        else:
+            list.__init__(self, args)
+        self.__dict__.update(kwargs)
