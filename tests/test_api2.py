@@ -1,9 +1,10 @@
+import datetime
 from unittest import TestCase, mock
 
-from digitaldiocese_worthers.api2 import Worthers, WorthersResult
-import requests
-import datetime
 import httpretty
+import requests
+
+from digitaldiocese_worthers.api2 import Worthers, WorthersResult
 
 
 class WorthersTest(TestCase):
@@ -101,7 +102,7 @@ class WorthersTest(TestCase):
         self.worthers.generate_endpoint_url.assert_called_once_with('/v2/contacts/deleted')
         self.worthers.paged_get.assert_called_once_with(
             endpoint_url=endpoint_url, diocese_id=123, search_params=None, end_date=None,
-            fields=None, limit=None, offset=50, start_date=None
+            fields=None, limit=None, offset=50, start_date=None,
         )
 
     def test_get_contact_fields(self):
@@ -126,7 +127,7 @@ class WorthersTest(TestCase):
         )
 
         headers = {
-            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59'
+            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59',
         }
         mock_response = mock.Mock(spec=requests.Response)
         mock_response.headers = headers
@@ -142,6 +143,7 @@ class WorthersTest(TestCase):
 
         self.assertEqual(result, [{'some_key': 'some_value'}])
 
+        self.assertEqual(result.api_obj, self.worthers)
         self.assertEqual(result.headers, headers)
         self.assertEqual(result.rate_limit, 60)
         self.assertEqual(result.rate_limit_remaining, 59)
@@ -195,7 +197,7 @@ class WorthersTest(TestCase):
 
         get_return = WorthersResult([{'contact': ['id', 'surname']}])
         get_return.headers = {
-            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59'
+            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59',
         }
         self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
 
@@ -205,7 +207,7 @@ class WorthersTest(TestCase):
         self.assertEqual(result.total_count, 678)
         self.assertEqual(result.offset, 0)
         self.worthers.get.assert_called_once_with(
-            endpoint_url=endpoint_url, diocese_id=123, search_params=None, offset=0
+            endpoint_url=endpoint_url, diocese_id=123, search_params=None, offset=0, limit=100,
         )
 
     def test_paged_get__with_offset(self):
@@ -213,17 +215,20 @@ class WorthersTest(TestCase):
 
         get_return = WorthersResult([{'contact': ['id', 'surname']}])
         get_return.headers = {
-            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59'
+            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59',
         }
         self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
 
-        result = self.worthers.paged_get(endpoint_url=endpoint_url, diocese_id=123, offset=100)
+        result = self.worthers.paged_get(
+            endpoint_url=endpoint_url, diocese_id=123, offset=100, limit=500,
+        )
 
         self.assertEqual(result, get_return)
         self.assertEqual(result.total_count, 678)
         self.assertEqual(result.offset, 100)
+        self.assertEqual(result.limit, 500)
         self.worthers.get.assert_called_once_with(
-            endpoint_url=endpoint_url, diocese_id=123, search_params=None, offset=100
+            endpoint_url=endpoint_url, diocese_id=123, search_params=None, offset=100, limit=500,
         )
 
     def test_make_endpoint_url(self):
@@ -260,7 +265,7 @@ class WorthersTest(TestCase):
         }
         self.assertEqual(result, expected_result)
         self.worthers._prepare_search_params.assert_called_once_with(
-            diocese_id=123, wibble='wobble'
+            diocese_id=123, wibble='wobble',
         )
         self.worthers.generate_signature.assert_called_once_with(
             encode_search_params_return, an_extra_param='param_value',
@@ -309,7 +314,7 @@ class WorthersTest(TestCase):
     def test_generate_signature(self):
         result = self.worthers.generate_signature('simple_string_for_test', limit=1)
         self.assertEqual(
-            result, '0247f853074bcfca97e05b5a7889eb612795fd525258cb04aad0ea2e578528e0'
+            result, '0247f853074bcfca97e05b5a7889eb612795fd525258cb04aad0ea2e578528e0',
         )
 
     def test__prepare_search_params(self):

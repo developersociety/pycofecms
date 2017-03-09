@@ -1,13 +1,15 @@
-from collections import OrderedDict
-import json
-from hashlib import sha256
 import hmac
+import json
+from collections import OrderedDict
+from hashlib import sha256
+
 import requests
 
 
 class Worthers(object):
     BASE_URL = 'https://cmsapi.cofeportal.org'
     DATE_FORMAT = '%Y-%m-%d %H:%M'
+    DEFAULT_LIMIT = 100
 
     def __init__(self, api_id, api_key, diocese_id=None):
         self._diocese_id = None
@@ -42,7 +44,7 @@ class Worthers(object):
         endpoint_url = self.generate_endpoint_url('/v2/contacts')
         result = self.paged_get(
             endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
-            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date
+            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
         )
         return result
 
@@ -56,7 +58,7 @@ class Worthers(object):
 
     def get_deleted_contacts(
         self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
-        offset=None, start_date=None
+        offset=None, start_date=None,
     ):
         endpoint_url = self.generate_endpoint_url('/v2/contacts/deleted')
         result = self.paged_get(
@@ -81,6 +83,7 @@ class Worthers(object):
             from_json = [from_json]
 
         result = WorthersResult(from_json)
+        result.api_obj = self
         result.response = response
         result.headers = response.headers
         result.endpoint_url = endpoint_url
@@ -93,9 +96,11 @@ class Worthers(object):
 
     def paged_get(self, endpoint_url, diocese_id=None, search_params=None, **basic_params):
         basic_params['offset'] = basic_params.get('offset', 0)
+        basic_params['limit'] = basic_params.get('limit', Worthers.DEFAULT_LIMIT)
         result = self.get(endpoint_url, diocese_id, search_params, **basic_params)
         result.total_count = int(result.headers['X-Total-Count'])
         result.offset = basic_params['offset']
+        result.limit = basic_params['limit']
         return result
 
     def do_request(self, endpoint_url, request_params):

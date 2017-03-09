@@ -1,7 +1,8 @@
 import pprint
 
-from digitaldiocese_worthers.api2 import Worthers
 from django.core.management.base import BaseCommand
+
+from digitaldiocese_worthers.api2 import Worthers
 
 
 class Command(BaseCommand):
