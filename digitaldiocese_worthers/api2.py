@@ -41,21 +41,9 @@ class Worthers(object):
         """
         endpoint_url = self.generate_endpoint_url('/v2/contacts')
         result = self.get(
-            endpoint_url, diocese_id, search_params, end_date=end_date, fields=fields, limit=limit,
-            offset=offset, start_date=start_date
+            endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
+            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date
         )
-        return result
-
-        prepared_search_params = self._prepare_search_params(
-            search_params or {}, diocese_id=diocese_id
-        )
-
-        request_params = self.generate_request_params(
-            prepared_search_params, end_date=end_date, fields=fields, limit=limit, offset=offset,
-            start_date=start_date,
-        )
-
-        result = self.do_request(endpoint_url, request_params)
         return result
 
     def get_contact(self, contact_id, diocese_id=None):
@@ -66,49 +54,40 @@ class Worthers(object):
         result = self.get(endpoint_url, diocese_id)
         return result
 
+    def get_deleted_contacts(
+        self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
+        offset=None, start_date=None
+    ):
+        endpoint_url = self.generate_endpoint_url('/v2/contacts/deleted')
+        result = self.get(
+            endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
+            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
+        )
+        return result
+
     def get(self, endpoint_url, diocese_id=None, search_params=None, **basic_params):
-        search_params = search_params or {}
-        prepared_search_params = self._prepare_search_params(search_params, diocese_id=diocese_id)
-        request_params = self.generate_request_params(prepared_search_params, **basic_params)
+        request_params = self.generate_request_params(diocese_id, search_params, **basic_params)
         result = self.do_request(endpoint_url, request_params)
         return result
 
-    def _prepare_search_params(self, search_params, diocese_id=None):
-        search_params = OrderedDict(search_params)
-        search_params['diocese_id'] = diocese_id or self.diocese_id
-        return search_params
-
     def do_request(self, endpoint_url, request_params):
-        session = self.get_session()
+        session = self._get_session()
         return self._get_as_json(session, endpoint_url, request_params)
-
-    def _get_as_json(self, session, endpoint_url, request_params):
-        """
-        Use the supplied session to run a get request and return the decoded JSON data.
-        """
-        result = session.get(endpoint_url, params=request_params)
-        result.raise_for_status()
-        return result.json()
-
-    def get_session(self):
-        """
-        Returns a the current requests session.
-
-        If one does not currently exist, then will create one.
-        """
-        if self.session is None:
-            self.session = requests.Session()
-        return self.session
 
     def generate_endpoint_url(self, endpoint):
         endpoint_url = '{base_url}{endpoint}'.format(base_url=Worthers.BASE_URL, endpoint=endpoint)
         return endpoint_url
 
-    def generate_request_params(self, data, **basic_params):
+    def generate_request_params(self, diocese_id, search_params, **basic_params):
         """
         https://cmsapi.cofeportal.org/request-parameters
         """
-        json_search_params = self.encode_search_params(data)
+        search_params = search_params or {}
+        prepared_search_params = self._prepare_search_params(
+            diocese_id=diocese_id, **search_params,
+        )
+
+        json_search_params = self.encode_search_params(prepared_search_params)
 
         prepared_basic_params = self._prepare_basic_params(basic_params)
 
@@ -121,22 +100,6 @@ class Worthers(object):
         )
 
         return request_params
-
-    def _prepare_basic_params(self, basic_params):
-        # Filter out any None values
-        basic_params_filtered = dict((k, v) for k, v in basic_params.items() if v is not None)
-
-        # According to docs, only known Date fields are start_date and end_date
-        if basic_params_filtered.get('start_date', False):
-            basic_params_filtered['start_date'] = self.format_date(
-                basic_params_filtered['start_date']
-            )
-        if basic_params_filtered.get('end_date', False):
-            basic_params_filtered['end_date'] = self.format_date(
-                basic_params_filtered['end_date']
-            )
-
-        return basic_params_filtered
 
     def format_date(self, python_datetime):
         return python_datetime.strftime(Worthers.DATE_FORMAT)
@@ -165,3 +128,48 @@ class Worthers(object):
 
         digest = hmac.new(api_key, msg=msg, digestmod=sha256).hexdigest()
         return digest
+
+    def _prepare_search_params(self, **search_param_kwargs):
+        search_params = OrderedDict(search_param_kwargs)
+
+        diocese_id = search_param_kwargs.get('diocese_id', False) or self.diocese_id
+        search_params['diocese_id'] = diocese_id
+        return search_params
+
+    def _get_as_json(self, session, endpoint_url, request_params):
+        """
+        Use the supplied session to run a get request and return the decoded JSON data.
+        """
+        result = session.get(endpoint_url, params=request_params)
+        result.raise_for_status()
+        return result.json()
+
+    def _get_session(self):
+        """
+        Returns a the current requests session.
+
+        If one does not currently exist, then will create one.
+        """
+        if self.session is None:
+            self.session = requests.Session()
+        return self.session
+
+    def _prepare_basic_params(self, basic_params):
+        # Filter out any None values
+        basic_params_filtered = dict((k, v) for k, v in basic_params.items() if v is not None)
+
+        # According to docs, only known Date fields are start_date and end_date
+        if basic_params_filtered.get('start_date', False):
+            basic_params_filtered['start_date'] = self.format_date(
+                basic_params_filtered['start_date']
+            )
+        if basic_params_filtered.get('end_date', False):
+            basic_params_filtered['end_date'] = self.format_date(
+                basic_params_filtered['end_date']
+            )
+
+        # Json encode the fields dictionary
+        if basic_params_filtered.get('fields', False):
+            basic_params_filtered['fields'] = json.dumps(basic_params_filtered['fields'])
+
+        return basic_params_filtered

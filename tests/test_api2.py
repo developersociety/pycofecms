@@ -28,11 +28,116 @@ class WorthersTest(TestCase):
         worthers.diocese_id = 123
         self.assertEqual(worthers.diocese_id, 123)
 
+    def test_get_contacts(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts'
+        self.worthers.generate_endpoint_url = mock.Mock(
+            spec=self.worthers.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'wibble': 'wobble'}]
+        self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
+
+        result = self.worthers.get_contacts()
+
+        self.assertEqual(result, get_return)
+        self.worthers.generate_endpoint_url.assert_called_once_with('/v2/contacts')
+        self.worthers.get.assert_called_once_with(
+            endpoint_url, diocese_id=None, search_params=None, end_date=None, fields=None,
+            limit=None, offset=None, start_date=None,
+        )
+
+    def test_get_contacts__with_args(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts'
+        self.worthers.generate_endpoint_url = mock.Mock(
+            spec=self.worthers.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'wibble': 'wobble'}]
+        self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
+
+        end_date = datetime.datetime.now()
+        start_date = datetime.datetime.now()
+        result = self.worthers.get_contacts(
+            diocese_id=123, search_params={'some_key': 'some_value'}, end_date=end_date,
+            fields={'contact': ['surname']}, limit=10, offset=50, start_date=start_date,
+        )
+
+        self.assertEqual(result, get_return)
+        self.worthers.generate_endpoint_url.assert_called_once_with('/v2/contacts')
+        self.worthers.get.assert_called_once_with(
+            endpoint_url, diocese_id=123, search_params={'some_key': 'some_value'},
+            end_date=end_date, fields={'contact': ['surname']}, limit=10, offset=50,
+            start_date=start_date,
+        )
+
+    def test_get_contact(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts/123'
+        self.worthers.generate_endpoint_url = mock.Mock(
+            spec=self.worthers.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'wibble': 'wobble'}]
+        self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
+
+        result = self.worthers.get_contact(123)
+
+        self.assertEqual(result, get_return)
+        self.worthers.generate_endpoint_url.assert_called_once_with('/v2/contacts/123')
+        self.worthers.get.assert_called_once_with(endpoint_url=endpoint_url, diocese_id=None)
+
+    def test_get_deleted_contacts(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts/deleted'
+        self.worthers.generate_endpoint_url = mock.Mock(
+            spec=self.worthers.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'wibble': 'wobble'}]
+        self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
+
+        result = self.worthers.get_deleted_contacts(diocese_id=123, offset=50)
+
+        self.assertEqual(result, get_return)
+        self.worthers.generate_endpoint_url.assert_called_once_with('/v2/contacts/deleted')
+        self.worthers.get.assert_called_once_with(
+            endpoint_url=endpoint_url, diocese_id=123, search_params=None, end_date=None,
+            fields=None, limit=None, offset=50, start_date=None
+        )
+
+    def test_get(self):
+        request_params = {'api_id': 'some_api_id', 'data': '{"json_key": "json_value"}'}
+        self.worthers.generate_request_params = mock.Mock(
+            spec=self.worthers.generate_request_params, return_value=request_params,
+        )
+
+        request_return = [{'key': 'value'}]
+        self.worthers.do_request = mock.Mock(
+            spec=self.worthers.do_request, return_value=request_return
+        )
+
+        result = self.worthers.get(
+            'https://cmsapi.cofeportal.org/v2/some_end_point', diocese_id=123,
+            search_params={'postcode': 'cv1 1aa'}, wibble='wobble', limit=10,
+        )
+
+        self.assertEqual(result, request_return)
+        self.worthers.generate_request_params.assert_called_once_with(
+            diocese_id=123, search_params={'postcode': 'cv1 1aa'}, wibble='wobble', limit=10,
+        )
+        self.worthers.do_request.assert_called_once_with(
+            endpoint_url='https://cmsapi.cofeportal.org/v2/some_end_point',
+            request_params=request_params,
+        )
+
     def test_make_endpoint_url(self):
         result = self.worthers.generate_endpoint_url('/v2/contacts')
         self.assertEqual(result, 'https://cmsapi.cofeportal.org/v2/contacts')
 
     def test_generate_request_params(self):
+        prepared_search_params = {'diocese_id': 123}
+        self.worthers._prepare_search_params = mock.Mock(
+            spec=self.worthers._prepare_search_params, return_value=prepared_search_params
+        )
+
         encode_search_params_return = '{"wibble": "wobble"}'
         self.worthers.encode_search_params = mock.Mock(spec=self.worthers.encode_search_params)
         self.worthers.encode_search_params.return_value = encode_search_params_return
@@ -48,7 +153,7 @@ class WorthersTest(TestCase):
         self.worthers.generate_signature.return_value = generate_signature_return
 
         result = self.worthers.generate_request_params(
-            {'wibble': 'wobble'}, an_extra_param='param_value',
+            diocese_id=123, search_params={'wibble': 'wobble'}, an_extra_param='param_value',
         )
 
         expected_result = {
@@ -56,6 +161,9 @@ class WorthersTest(TestCase):
             'sig': generate_signature_return, 'an_extra_param': 'param_value',
         }
         self.assertEqual(result, expected_result)
+        self.worthers._prepare_search_params.assert_called_once_with(
+            diocese_id=123, wibble='wobble'
+        )
         self.worthers.generate_signature.assert_called_once_with(
             encode_search_params_return, an_extra_param='param_value',
         )
@@ -79,8 +187,15 @@ class WorthersTest(TestCase):
         result = self.worthers._prepare_basic_params(params)
 
         expected_result = {
-            'good': 'good_value', 'start_date': '2017-06-09 22:30', 'end_date': '2017-08-02 09:05'
+            'good': 'good_value', 'start_date': '2017-06-09 22:30', 'end_date': '2017-08-02 09:05',
         }
+        self.assertEqual(result, expected_result)
+
+    def test__prepare_basic_params__encode_fields(self):
+        params = {'good': 'good_value', 'fields': {'contact': ['forenames', 'surname']}}
+        result = self.worthers._prepare_basic_params(params)
+
+        expected_result = {'good': 'good_value', 'fields': '{"contact": ["forenames", "surname"]}'}
         self.assertEqual(result, expected_result)
 
     def test_format_date(self):
@@ -99,27 +214,23 @@ class WorthersTest(TestCase):
             result, '0247f853074bcfca97e05b5a7889eb612795fd525258cb04aad0ea2e578528e0'
         )
 
-    def test_get_contacts(self):
-        pass
-
     def test__prepare_search_params(self):
         search_params = {'some_search_param': 'some_value'}
-        result = self.worthers._prepare_search_params(search_params)
-
+        result = self.worthers._prepare_search_params(**search_params)
         expected_result = {'some_search_param': 'some_value', 'diocese_id': 123}
         self.assertEqual(result, expected_result)
 
-        result = self.worthers._prepare_search_params({}, 456)
+        result = self.worthers._prepare_search_params(diocese_id=456)
         self.assertEqual(result, {'diocese_id': 456})
 
         self.worthers.diocese_id = 789
-        result = self.worthers._prepare_search_params({})
+        result = self.worthers._prepare_search_params()
         self.assertEqual(result, {'diocese_id': 789})
 
     def test_do_request(self):
         mock_session = mock.Mock(spec=requests.Session)
-        self.worthers.get_session = mock.Mock(spec=self.worthers.get_session)
-        self.worthers.get_session.return_value = mock_session
+        self.worthers._get_session = mock.Mock(spec=self.worthers._get_session)
+        self.worthers._get_session.return_value = mock_session
 
         expected_data = [{'some_key': 'some value'}]
         self.worthers._get_as_json = mock.Mock(spec=self.worthers._get_as_json)
@@ -165,11 +276,11 @@ class WorthersTest(TestCase):
         with self.assertRaises(requests.HTTPError):
             self.worthers._get_as_json(session, endpoint_url, request_params)
 
-    def test_get_session(self):
+    def test__get_session(self):
         self.assertIsNone(self.worthers.session)
-        session = self.worthers.get_session()
+        session = self.worthers._get_session()
 
         self.assertIsInstance(session, requests.Session)
 
-        session_2 = self.worthers.get_session()
+        session_2 = self.worthers._get_session()
         self.assertEqual(session, session_2)
