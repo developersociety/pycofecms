@@ -65,6 +65,11 @@ class Worthers(object):
         )
         return result
 
+    def get_contact_fields(self, diocese_id=None):
+        endpoint_url = self.generate_endpoint_url('/v2/contact-fields')
+        result = self.get(endpoint_url, diocese_id)
+        return result
+
     def get(self, endpoint_url, diocese_id=None, search_params=None, **basic_params):
         request_params = self.generate_request_params(diocese_id, search_params, **basic_params)
         result = self.do_request(endpoint_url, request_params)

@@ -103,6 +103,21 @@ class WorthersTest(TestCase):
             fields=None, limit=None, offset=50, start_date=None
         )
 
+    def test_get_contact_fields(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/contact-fields'
+        self.worthers.generate_endpoint_url = mock.Mock(
+            spec=self.worthers.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = {'contact': ['id', 'surname']}
+        self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
+
+        result = self.worthers.get_contact_fields(123)
+
+        self.assertEqual(result, get_return)
+        self.worthers.generate_endpoint_url.assert_called_once_with('/v2/contact-fields')
+        self.worthers.get.assert_called_once_with(endpoint_url=endpoint_url, diocese_id=123)
+
     def test_get(self):
         request_params = {'api_id': 'some_api_id', 'data': '{"json_key": "json_value"}'}
         self.worthers.generate_request_params = mock.Mock(
