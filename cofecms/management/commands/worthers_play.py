@@ -8,8 +8,8 @@ from cofecms.api import CofeCMS
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        worthers = CofeCMS(options['api_id'], options['api_key'], options['diocese_id'])
-        result = worthers.get_contacts(
+        cofecms = CofeCMS(options['api_id'], options['api_key'], options['diocese_id'])
+        result = cofecms.get_contacts(
             limit=10, search_params={'keyword': 'smith', 'keyword_names_only': 'on'},
             fields={'contact': ['forenames', 'surname']},
         )
