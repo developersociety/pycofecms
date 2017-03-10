@@ -1,5 +1,5 @@
 =============================================
-Django Digital Diocese - Worthers Integration
+Django Digital Diocese - CofeCMS Integration
 =============================================
 
 Oo

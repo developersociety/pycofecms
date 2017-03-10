@@ -7,7 +7,7 @@ from hashlib import sha256
 import requests
 
 
-class Worthers(object):
+class CofeCMS(object):
     BASE_URL = 'https://cmsapi.cofeportal.org'
     DATE_FORMAT = '%Y-%m-%d %H:%M'
     DEFAULT_LIMIT = 100
@@ -83,7 +83,7 @@ class Worthers(object):
         if isinstance(from_json, dict):
             from_json = [from_json]
 
-        result = WorthersResult(from_json)
+        result = CofeCMSResult(from_json)
         result.api_obj = self
         result.response = response
         result.headers = response.headers
@@ -97,7 +97,7 @@ class Worthers(object):
 
     def paged_get(self, endpoint_url, diocese_id=None, search_params=None, **basic_params):
         basic_params['offset'] = basic_params.get('offset', 0)
-        basic_params['limit'] = basic_params.get('limit', Worthers.DEFAULT_LIMIT)
+        basic_params['limit'] = basic_params.get('limit', CofeCMS.DEFAULT_LIMIT)
 
         result = self.get(endpoint_url, diocese_id, search_params, **basic_params)
 
@@ -119,7 +119,7 @@ class Worthers(object):
         return result
 
     def generate_endpoint_url(self, endpoint):
-        endpoint_url = '{base_url}{endpoint}'.format(base_url=Worthers.BASE_URL, endpoint=endpoint)
+        endpoint_url = '{base_url}{endpoint}'.format(base_url=CofeCMS.BASE_URL, endpoint=endpoint)
         return endpoint_url
 
     def generate_request_params(self, diocese_id, search_params, **basic_params):
@@ -146,7 +146,7 @@ class Worthers(object):
         return request_params
 
     def format_date(self, python_datetime):
-        return python_datetime.strftime(Worthers.DATE_FORMAT)
+        return python_datetime.strftime(CofeCMS.DATE_FORMAT)
 
     def encode_search_params(self, search_params):
         """
@@ -211,7 +211,7 @@ class Worthers(object):
         return basic_params_filtered
 
 
-class WorthersResult(list):
+class CofeCMSResult(list):
     def __new__(self, *args, **kwargs):
         return super().__new__(self, args, kwargs)
 

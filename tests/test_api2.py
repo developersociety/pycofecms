@@ -4,26 +4,26 @@ from unittest import TestCase, mock
 import httpretty
 import requests
 
-from digitaldiocese_worthers.api2 import Worthers, WorthersResult
+from cofecms.api import CofeCMS, CofeCMSResult
 
 
-class WorthersTest(TestCase):
+class CofeCMSTest(TestCase):
 
     def setUp(self):
-        self.worthers = Worthers(api_id='test_api_id', api_key='test_api_key', diocese_id=123)
+        self.worthers = CofeCMS(api_id='test_api_id', api_key='test_api_key', diocese_id=123)
 
     def test_init(self):
-        worthers = Worthers(api_id='test_api_id', api_key='test_api_key')
+        worthers = CofeCMS(api_id='test_api_id', api_key='test_api_key')
         self.assertEqual(worthers.api_id, 'test_api_id')
         self.assertEqual(worthers.api_key, 'test_api_key')
 
-        worthers = Worthers(api_id='test_api_id', api_key='test_api_key', diocese_id=123)
+        worthers = CofeCMS(api_id='test_api_id', api_key='test_api_key', diocese_id=123)
         self.assertEqual(worthers.api_id, 'test_api_id')
         self.assertEqual(worthers.api_key, 'test_api_key')
         self.assertEqual(worthers.diocese_id, 123)
 
     def test_diocese_id(self):
-        worthers = Worthers(api_id='test_api_id', api_key='test_api_key')
+        worthers = CofeCMS(api_id='test_api_id', api_key='test_api_key')
         with self.assertRaises(NotImplementedError):
             worthers.diocese_id
 
@@ -195,7 +195,7 @@ class WorthersTest(TestCase):
     def test_paged_get(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts'
 
-        get_return = WorthersResult([{'contact': ['id', 'surname']}])
+        get_return = CofeCMSResult([{'contact': ['id', 'surname']}])
         get_return.headers = {
             'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59',
         }
@@ -214,7 +214,7 @@ class WorthersTest(TestCase):
     def test_paged_get__with_offset(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts'
 
-        get_return = WorthersResult([{'contact': ['id', 'surname']}])
+        get_return = CofeCMSResult([{'contact': ['id', 'surname']}])
         get_return.headers = {
             'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59',
         }
@@ -361,14 +361,14 @@ class WorthersTest(TestCase):
         self.assertEqual(session, session_2)
 
 
-class WorthersResultTest(TestCase):
+class CofeCMSResultTest(TestCase):
 
     def test_init(self):
-        worthers_result = WorthersResult([1, 2, 3])
+        worthers_result = CofeCMSResult([1, 2, 3])
         self.assertEqual(worthers_result, [1, 2, 3])
 
     def test_works_as_list(self):
-        worthers_result = WorthersResult()
+        worthers_result = CofeCMSResult()
         worthers_result.append('wibble')
         worthers_result.append('wobble')
         self.assertEqual(worthers_result, ['wibble', 'wobble'])
@@ -380,12 +380,12 @@ class WorthersResultTest(TestCase):
         self.assertEqual(worthers_result, ['wibble'])
 
     def test_getattr(self):
-        worthers_result = WorthersResult()
+        worthers_result = CofeCMSResult()
         worthers_result.some_attr = 'wibble'
         self.assertEqual(worthers_result.some_attr, 'wibble')
 
     def test_total_pages(self):
-        worthers_result = WorthersResult()
+        worthers_result = CofeCMSResult()
         worthers_result.total_count = 1
         worthers_result.limit = 100
         self.assertEqual(worthers_result.total_pages, 1)
@@ -395,7 +395,7 @@ class WorthersResultTest(TestCase):
         self.assertEqual(worthers_result.total_pages, 2)
 
     def test_all(self):
-        worthers_result = WorthersResult()
+        worthers_result = CofeCMSResult()
         worthers_result.pages_generator = mock.Mock(
             spec=worthers_result.pages_generator, return_value=[[{'a': 'aa'}], [{'b': 'bb'}]]
         )
@@ -406,12 +406,12 @@ class WorthersResultTest(TestCase):
 
     def test_pages_generator(self):
         with mock.patch(
-            'digitaldiocese_worthers.api2.WorthersResult.total_pages',
+            'cofecms.api.CofeCMSResult.total_pages',
             new_callable=mock.PropertyMock,
         ) as mock_total_pages:
             mock_total_pages.return_value = 2
 
-            worthers_result = WorthersResult([{'a': 'aa'}])
+            worthers_result = CofeCMSResult([{'a': 'aa'}])
 
             worthers_result.get_data_for_page = mock.Mock(
                 spec=worthers_result.get_data_for_page, return_value=[{'b': 'bb'}],
@@ -425,7 +425,7 @@ class WorthersResultTest(TestCase):
             worthers_result.get_data_for_page.assert_called_once_with(1)
 
     def test_get_data_for_page(self):
-        worthers_result = WorthersResult()
+        worthers_result = CofeCMSResult()
         worthers_result.endpoint_url = 'http://example.com/some_end_point'
         worthers_result.diocese_id = 123
         worthers_result.search_params = {'keyword': 'smith'}
@@ -433,10 +433,10 @@ class WorthersResultTest(TestCase):
         worthers_result.limit = 5
         worthers_result.basic_params = {'fields': ['forenames', 'surname']}
 
-        mock_api_obj = mock.Mock(spec=Worthers)
+        mock_api_obj = mock.Mock(spec=CofeCMS)
         worthers_result.api_obj = mock_api_obj
 
-        mock_result = mock.Mock(spec=Worthers)
+        mock_result = mock.Mock(spec=CofeCMS)
         mock_api_obj.paged_get.return_value = mock_result
 
         result = worthers_result.get_data_for_page(3)
