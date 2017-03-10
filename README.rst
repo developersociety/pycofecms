@@ -21,7 +21,7 @@ Quick Start
     >>> cofe = CofeCMS(API_ID, API_KEY, diocese_id)
     >>> result = cofe.get_contacts(
         limit=10,
-        fields={'contact': ['forenames', 'surname']},
+        fields={'contact': ['surname']},
         search_params={'keyword': 'smith', 'keyword_names_only': 'on'},
     )
 
