@@ -40,7 +40,25 @@ class CofeCMS(object):
         offset=None, start_date=None,
     ):
         """
-        https://cmsapi.cofeportal.org/get-contacts
+        Retrieve a collection of contact records.
+
+        API docs: https://cmsapi.cofeportal.org/get-contacts
+
+        Args:
+            diocese_id: Optionally supply the diocese_id.
+            search_params: Optionally provide a dict of search params. See the API docs for more
+                information.
+            end_date: Optional datetime to only return records that were updated on or before this
+                date.
+            fields: Optional list of fields to be included in the response. See output of
+                get_contact_fields() for a list of valid fields.
+            limit: The maximum number of records to return at once. Maximum of 1000.
+            offset: The number of records to skip. Used for getting paged results. Defaults to 0.
+            start_date: Optional datetime to only return records that were updated on or after this
+                date.
+
+        Returns:
+            A CofeCMSResult with the results of the query.
         """
         endpoint_url = self.generate_endpoint_url('/v2/contacts')
         result = self.paged_get(
@@ -51,7 +69,16 @@ class CofeCMS(object):
 
     def get_contact(self, contact_id, diocese_id=None):
         """
-        https://cmsapi.cofeportal.org/get-contacts-id
+        Retrieve data on a single contact.
+
+        API docs: https://cmsapi.cofeportal.org/get-contacts-id
+
+        Args:
+            contact_id: The ID of the requested contact
+            diocese_id: Optionally supply the diocese_id.
+
+        Returns:
+            A CofeCMSResult with the results of the query.
         """
         endpoint_url = self.generate_endpoint_url('/v2/contacts/{}'.format(contact_id))
         result = self.paged_get(endpoint_url, diocese_id)
@@ -61,6 +88,26 @@ class CofeCMS(object):
         self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
         offset=None, start_date=None,
     ):
+        """
+        Retrieve a collection of deleted contact records.
+
+        API docs: https://cmsapi.cofeportal.org/get-contacts-deleted
+
+        Args:
+            diocese_id: Optionally supply the diocese_id.
+            search_params: Optionally provide a dict of search params. See the API docs for more
+                information.
+            end_date: Optional datetime to only return records that were updated on or before this
+                date.
+            fields: Optional list of fields to be included in the response. See output of
+                get_contact_fields() for a list of valid fields.
+            limit: The maximum number of records to return at once. Maximum of 1000.
+            offset: The number of records to skip. Used for getting paged results. Defaults to 0.
+            start_date: Optional datetime to only return records that were updated on or after this
+                date.
+        Returns:
+            A CofeCMSResult with the results of the query.
+        """
         endpoint_url = self.generate_endpoint_url('/v2/contacts/deleted')
         result = self.paged_get(
             endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
@@ -69,11 +116,43 @@ class CofeCMS(object):
         return result
 
     def get_contact_fields(self, diocese_id=None):
+        """
+        Retrieves all possible fields for contacts.
+
+        API docs: https://cmsapi.cofeportal.org/get-contact-fields
+
+        Args:
+            diocese_id: Optionally supply the diocese_id.
+
+        Returns:
+            A CofeCMSResult with the results of the query.
+        """
         endpoint_url = self.generate_endpoint_url('/v2/contact-fields')
         result = self.get(endpoint_url, diocese_id)
         return result
 
     def get(self, endpoint_url, diocese_id=None, search_params=None, **basic_params):
+        """
+        Perform a generic request against the API and retrieves the results.
+
+        Note: This is a fairly raw way of requesting data from the API and will not hold your hand
+        for dealing with paged results. See 'paged_get' for a better way of doing raw queries
+        with paged results.
+
+        Args:
+            endpoint_url: The absolute URL for the endpoint to use. For example:
+                https://cmsapi.cofeportal.org/v2/contacts
+            diocese_id: Optionally supply the diocese_id.
+            search_params: A dict containing search params. The API docs contain more information
+                on this: https://cmsapi.cofeportal.org/json-data-string.
+            **basic_params: Pass general request parameters as needed by the endpoint. 'api_id',
+                'data' and 'sig' params are automatically added for you. The API docs give more
+                information on what params can be used:
+                https://cmsapi.cofeportal.org/request-parameters
+
+        Returns:
+            A CofeCMSResult with the results and details of the query.
+        """
         request_params = self.generate_request_params(diocese_id, search_params, **basic_params)
         response = self.do_request(endpoint_url, request_params)
 
@@ -96,6 +175,27 @@ class CofeCMS(object):
         return result
 
     def paged_get(self, endpoint_url, diocese_id=None, search_params=None, **basic_params):
+        """
+        Similar to 'get', however it also populates the result object with the necessary
+        information to make requests for more pages of data easier.
+
+        Args:
+            endpoint_url: The absolute URL for the endpoint to use. For example:
+                https://cmsapi.cofeportal.org/v2/contacts
+            diocese_id: Optionally supply the diocese_id.
+            search_params: A dict containing search params. The API docs contain more information
+                on this: https://cmsapi.cofeportal.org/json-data-string.
+            **basic_params: Pass general request parameters as needed by the endpoint. 'api_id',
+                'data' and 'sig' params are automatically added for you. The API docs give more
+                information on what params can be used:
+                https://cmsapi.cofeportal.org/request-parameters
+
+        Returns:
+            A CofeCMSResult with the results and details of the query.
+
+            The CofeCMSResult will be populated with the used offset, limit used in the request,
+            and will also add the total_count attribute from the 'X-Total-Count' header.
+        """
         basic_params['offset'] = basic_params.get('offset', 0)
         basic_params['limit'] = basic_params.get('limit', CofeCMS.DEFAULT_LIMIT)
 
@@ -113,18 +213,57 @@ class CofeCMS(object):
         return result
 
     def do_request(self, endpoint_url, request_params):
+        """
+        Performs a request to the given endpoint_url with the supplied request params.
+
+        Args:
+            endpoint_url: The absolute URL for the endpoint to use. For example:
+                https://cmsapi.cofeportal.org/v2/contacts
+            request_params: A dict containing the GET params for this request. Will be URL encoded
+            for you.
+
+        Returns:
+            An unmolested requests.Result object.
+
+        Raises:
+            Will raise the appropriate HTTP exception for any non-200 HTTP response.
+        """
         session = self._get_session()
         result = session.get(endpoint_url, params=request_params)
         result.raise_for_status()
         return result
 
     def generate_endpoint_url(self, endpoint):
+        """
+        Generate an absolute URL for a given endpoint.
+
+        Uses the BASE_URL constant.
+
+        Args:
+            endpoint: The endpoint to use, as defined in the specs. For example: '/v2/contacts'.
+
+        Returns:
+            The absolute URL for the given endpoint.
+        """
         endpoint_url = '{base_url}{endpoint}'.format(base_url=CofeCMS.BASE_URL, endpoint=endpoint)
         return endpoint_url
 
     def generate_request_params(self, diocese_id, search_params, **basic_params):
         """
-        https://cmsapi.cofeportal.org/request-parameters
+        Generate a dict containing the GET request parameters for a request.
+
+        The required 'api_id', 'data' and 'sig' params are always added.
+
+        API docs: https://cmsapi.cofeportal.org/request-parameters
+
+        Args:
+            diocese_id: Optionally supply the diocese_id.
+            search_params: A dict of search params. The API docs have more information on this:
+                https://cmsapi.cofeportal.org/json-data-string.
+            **basic_params: Any extra params for the API call, for example to set a limit on.
+
+        Returns:
+            A dict containing the final requst params, including the calculated signing 'sig'.
         """
         search_params = search_params or {}
         prepared_search_params = self._prepare_search_params(
@@ -146,19 +285,44 @@ class CofeCMS(object):
         return request_params
 
     def format_date(self, python_datetime):
+        """
+        Format the given Python datetime to the format used by the API.
+
+        Args:
+            python_datetime: The datetime to format
+
+        Returns:
+            A string representation of the date which can be used by the API.
+        """
         return python_datetime.strftime(CofeCMS.DATE_FORMAT)
 
     def encode_search_params(self, search_params):
         """
-        Returns a JSON representation of the supplied dict suitable for use in the 'search_params'
+        Generate a JSON representation of the supplied dict suitable for use in the 'search_params'
         parameter.
+
+        Args:
+            search_params: A dict of search params. The API docs contain more information:
+                https://cmsapi.cofeportal.org/json-data-string.
+
+        Returns:
+            A JSON string of the provided search_params.
         """
         json_search_params = json.dumps(search_params)
         return json_search_params
 
     def generate_signature(self, json_search_params, **basic_params):
         """
-        https://cmsapi.cofeportal.org/signing-requests
+        Generate a signature used for signing each request.
+
+        The process is described here: https://cmsapi.cofeportal.org/signing-requests
+
+        Args:
+            json_search_params: The JSON encoded search_params.
+            **basic_params: Any extra params for the request.
+
+        Returns:
+            A string containing the hexadecimal signature for the request.
         """
         to_be_hashed = basic_params.copy()
         to_be_hashed['api_id'] = self.api_id
