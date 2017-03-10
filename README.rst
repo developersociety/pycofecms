@@ -15,13 +15,13 @@ receive your access credentials.
 Quick Start
 ===========
 
-::
+.. code-block:: python
 
     >>> from cofecms import CofeCMS
     >>> cofe = CofeCMS(API_ID, API_KEY, diocese_id)
     >>> result = cofe.get_contacts(
         limit=10,
-        fields={'contact': ['forenames', 'surname']},
+        fields={'contact': ['surname']},
         search_params={'keyword': 'smith', 'keyword_names_only': 'on'},
     )
 
@@ -61,7 +61,7 @@ Quick Start
 
     >>> # Loop through all available pages
     >>> for page in result.pages_generator():
-    >>>     print(len(page))
+            print(len(page))
     10
     10
     10
