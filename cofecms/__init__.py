@@ -1,1 +1,1 @@
-default_app_config = 'cofecms.apps.DigitalDioceseCofeCMSConfig'
+from cofecms.api import CofeCMS  # noqa
