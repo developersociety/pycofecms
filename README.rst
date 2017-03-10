@@ -15,7 +15,7 @@ receive your access credentials.
 Quick Start
 ===========
 
-::
+.. code-block:: python
 
     >>> from cofecms import CofeCMS
     >>> cofe = CofeCMS(API_ID, API_KEY, diocese_id)
@@ -61,7 +61,7 @@ Quick Start
 
     >>> # Loop through all available pages
     >>> for page in result.pages_generator():
-    >>>     print(len(page))
+            print(len(page))
     10
     10
     10
