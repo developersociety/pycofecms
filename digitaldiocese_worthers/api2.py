@@ -1,5 +1,6 @@
 import hmac
 import json
+import math
 from collections import OrderedDict
 from hashlib import sha256
 
@@ -97,10 +98,18 @@ class Worthers(object):
     def paged_get(self, endpoint_url, diocese_id=None, search_params=None, **basic_params):
         basic_params['offset'] = basic_params.get('offset', 0)
         basic_params['limit'] = basic_params.get('limit', Worthers.DEFAULT_LIMIT)
+
         result = self.get(endpoint_url, diocese_id, search_params, **basic_params)
+
         result.total_count = int(result.headers['X-Total-Count'])
+
         result.offset = basic_params['offset']
+        if 'offset' in result.basic_params:
+            del(result.basic_params['offset'])
+
         result.limit = basic_params['limit']
+        if 'limit' in result.basic_params:
+            del(result.basic_params['limit'])
         return result
 
     def do_request(self, endpoint_url, request_params):
@@ -212,3 +221,31 @@ class WorthersResult(list):
         else:
             list.__init__(self, args)
         self.__dict__.update(kwargs)
+
+    def all(self):
+        data = []
+        for page in self.pages_generator():
+            data = data + page
+        return data
+
+    def pages_generator(self):
+        for current_page_num in range(0, self.total_pages):
+            if current_page_num == 0:
+                # No need to get current results again
+                current_page_data = self
+            else:
+                current_page_data = self.get_data_for_page(current_page_num)
+            yield current_page_data
+
+    def get_data_for_page(self, page_num):
+        offset = page_num * self.limit
+        result = self.api_obj.paged_get(
+            endpoint_url=self.endpoint_url, diocese_id=self.diocese_id,
+            search_params=self.search_params, offset=offset, limit=self.limit,
+            **self.basic_params,
+        )
+        return result
+
+    @property
+    def total_pages(self):
+        return math.floor(self.total_count / self.limit) + 1

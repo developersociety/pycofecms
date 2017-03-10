@@ -199,6 +199,7 @@ class WorthersTest(TestCase):
         get_return.headers = {
             'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59',
         }
+        get_return.basic_params = {'limit': 100, 'offset': 0}
         self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
 
         result = self.worthers.paged_get(endpoint_url=endpoint_url, diocese_id=123)
@@ -217,6 +218,7 @@ class WorthersTest(TestCase):
         get_return.headers = {
             'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59',
         }
+        get_return.basic_params = {}
         self.worthers.get = mock.Mock(spec=self.worthers.get, return_value=get_return)
 
         result = self.worthers.paged_get(
@@ -362,22 +364,87 @@ class WorthersTest(TestCase):
 class WorthersResultTest(TestCase):
 
     def test_init(self):
-        result_page = WorthersResult([1, 2, 3])
-        self.assertEqual(result_page, [1, 2, 3])
+        worthers_result = WorthersResult([1, 2, 3])
+        self.assertEqual(worthers_result, [1, 2, 3])
 
     def test_works_as_list(self):
-        result_page = WorthersResult()
-        result_page.append('wibble')
-        result_page.append('wobble')
-        self.assertEqual(result_page, ['wibble', 'wobble'])
-        self.assertIn('wibble', result_page)
-        self.assertIn('wobble', result_page)
+        worthers_result = WorthersResult()
+        worthers_result.append('wibble')
+        worthers_result.append('wobble')
+        self.assertEqual(worthers_result, ['wibble', 'wobble'])
+        self.assertIn('wibble', worthers_result)
+        self.assertIn('wobble', worthers_result)
 
-        pop_result = result_page.pop()
+        pop_result = worthers_result.pop()
         self.assertEqual(pop_result, 'wobble')
-        self.assertEqual(result_page, ['wibble'])
+        self.assertEqual(worthers_result, ['wibble'])
 
     def test_getattr(self):
-        result_page = WorthersResult()
-        result_page.some_attr = 'wibble'
-        self.assertEqual(result_page.some_attr, 'wibble')
+        worthers_result = WorthersResult()
+        worthers_result.some_attr = 'wibble'
+        self.assertEqual(worthers_result.some_attr, 'wibble')
+
+    def test_total_pages(self):
+        worthers_result = WorthersResult()
+        worthers_result.total_count = 1
+        worthers_result.limit = 100
+        self.assertEqual(worthers_result.total_pages, 1)
+
+        worthers_result.total_count = 9
+        worthers_result.limit = 7
+        self.assertEqual(worthers_result.total_pages, 2)
+
+    def test_all(self):
+        worthers_result = WorthersResult()
+        worthers_result.pages_generator = mock.Mock(
+            spec=worthers_result.pages_generator, return_value=[[{'a': 'aa'}], [{'b': 'bb'}]]
+        )
+
+        result = worthers_result.all()
+
+        self.assertEqual(result, [{'a': 'aa'}, {'b': 'bb'}])
+
+    def test_pages_generator(self):
+        with mock.patch(
+            'digitaldiocese_worthers.api2.WorthersResult.total_pages',
+            new_callable=mock.PropertyMock,
+        ) as mock_total_pages:
+            mock_total_pages.return_value = 2
+
+            worthers_result = WorthersResult([{'a': 'aa'}])
+
+            worthers_result.get_data_for_page = mock.Mock(
+                spec=worthers_result.get_data_for_page, return_value=[{'b': 'bb'}],
+            )
+
+            results = []
+            for result in worthers_result.pages_generator():
+                results.append(result)
+
+            self.assertEqual(results, [[{'a': 'aa'}], [{'b': 'bb'}]])
+            worthers_result.get_data_for_page.assert_called_once_with(1)
+
+    def test_get_data_for_page(self):
+        worthers_result = WorthersResult()
+        worthers_result.endpoint_url = 'http://example.com/some_end_point'
+        worthers_result.diocese_id = 123
+        worthers_result.search_params = {'keyword': 'smith'}
+        worthers_result.offset = 10
+        worthers_result.limit = 5
+        worthers_result.basic_params = {'fields': ['forenames', 'surname']}
+
+        mock_api_obj = mock.Mock(spec=Worthers)
+        worthers_result.api_obj = mock_api_obj
+
+        mock_result = mock.Mock(spec=Worthers)
+        mock_api_obj.paged_get.return_value = mock_result
+
+        result = worthers_result.get_data_for_page(3)
+
+        self.assertEqual(result, mock_result)
+
+        mock_api_obj.paged_get.assert_called_once_with(
+            endpoint_url='http://example.com/some_end_point', diocese_id=123,
+            search_params={'keyword': 'smith'}, offset=15, limit=5,
+            fields=['forenames', 'surname'],
+        )
