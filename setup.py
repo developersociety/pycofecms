@@ -1,16 +1,16 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='django-digitaldiocese-worthers',
+    name='django-digitaldiocese-cofecms',
     packages=find_packages(),
     version='0.0.1',
     author='Blanc Ltd',
     author_email='studio@blanc.ltd.uk',
-    description='Enables Worthers integration for Digital Diocese',
+    description='Python client for the Church of England CMS API',
     license='BSD',
-    url='https://github.com/blancltd/django-digitaldiocese-worthers',
+    url='https://github.com/blancltd/django-digitaldiocese-cofecms',
     include_package_data=True,
     install_requires=[
-        'django-digitaldiocese>=1.5.0',
+        'requests>=2.0.0',
     ],
 )
