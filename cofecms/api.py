@@ -6,7 +6,6 @@ from hashlib import sha256
 
 import requests
 
-
 PLACE_TYPE_ARCHDEACONRY = 1
 PLACE_TYPE_BENEFICE = 2
 PLACE_TYPE_CHURCH = 3

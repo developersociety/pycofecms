@@ -1,5 +1,5 @@
-from cofecms.api import CofeCMS  # noqa
 import cofecms.api
+from cofecms.api import CofeCMS  # noqa
 
 PLACE_TYPE_ARCHDEACONRY = cofecms.api.PLACE_TYPE_ARCHDEACONRY
 PLACE_TYPE_BENEFICE = cofecms.api.PLACE_TYPE_BENEFICE
