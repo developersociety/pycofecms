@@ -115,6 +115,166 @@ class CofeCMS(object):
         )
         return result
 
+    def get_posts(
+        self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
+        offset=None, start_date=None,
+    ):
+        """
+        Retrieve a collection of records containing post, place, contact and role fields.
+
+        API docs: https://cmsapi.cofeportal.org/get-posts
+
+        Args:
+            diocese_id: Optionally supply the diocese_id.
+            search_params: Optionally provide a dict of search params. See the API docs for more
+                information.
+            end_date: Optional datetime to only return records that were updated on or before this
+                date.
+            fields: Optional list of fields to be included in the response. See output of
+                get_contact_fields() for a list of valid fields.
+            limit: The maximum number of records to return at once. Maximum of 1000.
+            offset: The number of records to skip. Used for getting paged results. Defaults to 0.
+            start_date: Optional datetime to only return records that were updated on or after this
+                date.
+
+        Returns:
+            A CofeCMSResult with the results of the query.
+        """
+        endpoint_url = self.generate_endpoint_url('/v2/posts')
+        result = self.paged_get(
+            endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
+            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
+        )
+        return result
+
+    def get_post(self, post_id, diocese_id=None):
+        """
+        Retrieve a single records containing post, place, contact and role fields.
+
+        API docs: https://cmsapi.cofeportal.org/get-posts-id
+
+        Args:
+            post_id: The ID of the requested post
+            diocese_id: Optionally supply the diocese_id.
+
+        Returns:
+            A CofeCMSResult with the results of the query.
+        """
+        endpoint_url = self.generate_endpoint_url('/v2/posts/{}'.format(post_id))
+        result = self.paged_get(endpoint_url, diocese_id)
+        return result
+
+    def get_deleted_posts(
+        self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
+        offset=None, start_date=None,
+    ):
+        """
+        Retrieve a collection of deleted records containing post, place, contact and role fields.
+
+        API docs: https://cmsapi.cofeportal.org/get-posts-deleted
+
+        Args:
+            diocese_id: Optionally supply the diocese_id.
+            search_params: Optionally provide a dict of search params. See the API docs for more
+                information.
+            end_date: Optional datetime to only return records that were updated on or before this
+                date.
+            fields: Optional list of fields to be included in the response. See output of
+                get_contact_fields() for a list of valid fields.
+            limit: The maximum number of records to return at once. Maximum of 1000.
+            offset: The number of records to skip. Used for getting paged results. Defaults to 0.
+            start_date: Optional datetime to only return records that were updated on or after this
+                date.
+        Returns:
+            A CofeCMSResult with the results of the query.
+        """
+        endpoint_url = self.generate_endpoint_url('/v2/posts/deleted')
+        result = self.paged_get(
+            endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
+            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
+        )
+        return result
+
+    def get_places(
+        self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
+        offset=None, start_date=None,
+    ):
+        """
+        Retrieve a collection of place records.
+
+        API docs: https://cmsapi.cofeportal.org/get-places
+
+        Args:
+            diocese_id: Optionally supply the diocese_id.
+            search_params: Optionally provide a dict of search params. See the API docs for more
+                information.
+            end_date: Optional datetime to only return records that were updated on or before this
+                date.
+            fields: Optional list of fields to be included in the response. See output of
+                get_contact_fields() for a list of valid fields.
+            limit: The maximum number of records to return at once. Maximum of 1000.
+            offset: The number of records to skip. Used for getting paged results. Defaults to 0.
+            start_date: Optional datetime to only return records that were updated on or after this
+                date.
+
+        Returns:
+            A CofeCMSResult with the results of the query.
+        """
+        endpoint_url = self.generate_endpoint_url('/v2/places')
+        result = self.paged_get(
+            endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
+            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
+        )
+        return result
+
+    def get_place(self, place_id, diocese_id=None):
+        """
+        Retrieve a single place record.
+
+        API docs: https://cmsapi.cofeportal.org/get-places-id
+
+        Args:
+            place_id: The ID of the requested place
+            diocese_id: Optionally supply the diocese_id.
+
+        Returns:
+            A CofeCMSResult with the results of the query.
+        """
+        endpoint_url = self.generate_endpoint_url('/v2/places/{}'.format(place_id))
+        result = self.paged_get(endpoint_url, diocese_id)
+        return result
+
+    def get_deleted_places(
+        self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
+        offset=None, start_date=None,
+    ):
+        """
+        Retrieve a collection of deleted place records.
+
+        API docs: https://cmsapi.cofeportal.org/get-places-deleted
+
+        Args:
+            diocese_id: Optionally supply the diocese_id.
+            search_params: Optionally provide a dict of search params. See the API docs for more
+                information.
+            end_date: Optional datetime to only return records that were updated on or before this
+                date.
+            fields: Optional list of fields to be included in the response. See output of
+                get_contact_fields() for a list of valid fields.
+            limit: The maximum number of records to return at once. Maximum of 1000.
+            offset: The number of records to skip. Used for getting paged results. Defaults to 0.
+            start_date: Optional datetime to only return records that were updated on or after this
+                date.
+        Returns:
+            A CofeCMSResult with the results of the query.
+        """
+        endpoint_url = self.generate_endpoint_url('/v2/places/deleted')
+        result = self.paged_get(
+            endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
+            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
+        )
+        return result
+
     def get_contact_fields(self, diocese_id=None):
         """
         Retrieves all possible fields for contacts.
@@ -128,6 +288,54 @@ class CofeCMS(object):
             A CofeCMSResult with the results of the query.
         """
         endpoint_url = self.generate_endpoint_url('/v2/contact-fields')
+        result = self.get(endpoint_url, diocese_id)
+        return result
+
+    def get_post_fields(self, diocese_id=None):
+        """
+        Retrieves all possible fields for posts.
+
+        API docs: https://cmsapi.cofeportal.org/get-post-fields
+
+        Args:
+            diocese_id: Optionally supply the diocese_id.
+
+        Returns:
+            A CofeCMSResult with the results of the query.
+        """
+        endpoint_url = self.generate_endpoint_url('/v2/post-fields')
+        result = self.get(endpoint_url, diocese_id)
+        return result
+
+    def get_place_fields(self, diocese_id=None):
+        """
+        Retrieves all possible fields for places.
+
+        API docs: https://cmsapi.cofeportal.org/get-place-fields
+
+        Args:
+            diocese_id: Optionally supply the diocese_id.
+
+        Returns:
+            A CofeCMSResult with the results of the query.
+        """
+        endpoint_url = self.generate_endpoint_url('/v2/place-fields')
+        result = self.get(endpoint_url, diocese_id)
+        return result
+
+    def get_roles(self, diocese_id=None):
+        """
+        Retrieves all defined role names and their ID.
+
+        API docs: https://cmsapi.cofeportal.org/get-roles
+
+        Args:
+            diocese_id: Optionally supply the diocese_id.
+
+        Returns:
+            A CofeCMSResult with the results of the query.
+        """
+        endpoint_url = self.generate_endpoint_url('/v2/roles')
         result = self.get(endpoint_url, diocese_id)
         return result
 
@@ -197,7 +405,7 @@ class CofeCMS(object):
             and will also add the total_count attribute from the 'X-Total-Count' header.
         """
         basic_params['offset'] = basic_params.get('offset', 0)
-        basic_params['limit'] = basic_params.get('limit', CofeCMS.DEFAULT_LIMIT)
+        basic_params['limit'] = basic_params.get('limit', False) or CofeCMS.DEFAULT_LIMIT
 
         result = self.get(endpoint_url, diocese_id, search_params, **basic_params)
 

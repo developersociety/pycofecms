@@ -105,19 +105,166 @@ class CofeCMSTest(TestCase):
             fields=None, limit=None, offset=50, start_date=None,
         )
 
+    def test_get_posts(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/posts'
+        self.cofecms.generate_endpoint_url = mock.Mock(
+            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'wibble': 'wobble'}]
+        self.cofecms.paged_get = mock.Mock(spec=self.cofecms.paged_get, return_value=get_return)
+
+        result = self.cofecms.get_posts()
+
+        self.assertEqual(result, get_return)
+        self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/posts')
+        self.cofecms.paged_get.assert_called_once_with(
+            endpoint_url, diocese_id=None, search_params=None, end_date=None, fields=None,
+            limit=None, offset=None, start_date=None,
+        )
+
+    def test_get_post(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/posts/123'
+        self.cofecms.generate_endpoint_url = mock.Mock(
+            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'wibble': 'wobble'}]
+        self.cofecms.paged_get = mock.Mock(spec=self.cofecms.get, return_value=get_return)
+
+        result = self.cofecms.get_post(123)
+
+        self.assertEqual(result, get_return)
+        self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/posts/123')
+        self.cofecms.paged_get.assert_called_once_with(endpoint_url=endpoint_url, diocese_id=None)
+
+    def test_get_deleted_posts(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/posts/deleted'
+        self.cofecms.generate_endpoint_url = mock.Mock(
+            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'wibble': 'wobble'}]
+        self.cofecms.paged_get = mock.Mock(spec=self.cofecms.get, return_value=get_return)
+
+        result = self.cofecms.get_deleted_posts(diocese_id=123, offset=50)
+
+        self.assertEqual(result, get_return)
+        self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/posts/deleted')
+        self.cofecms.paged_get.assert_called_once_with(
+            endpoint_url=endpoint_url, diocese_id=123, search_params=None, end_date=None,
+            fields=None, limit=None, offset=50, start_date=None,
+        )
+
+    def test_get_places(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/places'
+        self.cofecms.generate_endpoint_url = mock.Mock(
+            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'wibble': 'wobble'}]
+        self.cofecms.paged_get = mock.Mock(spec=self.cofecms.paged_get, return_value=get_return)
+
+        result = self.cofecms.get_places()
+
+        self.assertEqual(result, get_return)
+        self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/places')
+        self.cofecms.paged_get.assert_called_once_with(
+            endpoint_url, diocese_id=None, search_params=None, end_date=None, fields=None,
+            limit=None, offset=None, start_date=None,
+        )
+
+    def test_get_place(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/places/123'
+        self.cofecms.generate_endpoint_url = mock.Mock(
+            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'wibble': 'wobble'}]
+        self.cofecms.paged_get = mock.Mock(spec=self.cofecms.get, return_value=get_return)
+
+        result = self.cofecms.get_place(123)
+
+        self.assertEqual(result, get_return)
+        self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/places/123')
+        self.cofecms.paged_get.assert_called_once_with(endpoint_url=endpoint_url, diocese_id=None)
+
+    def test_get_deleted_places(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/places/deleted'
+        self.cofecms.generate_endpoint_url = mock.Mock(
+            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'wibble': 'wobble'}]
+        self.cofecms.paged_get = mock.Mock(spec=self.cofecms.get, return_value=get_return)
+
+        result = self.cofecms.get_deleted_places(diocese_id=123, offset=50)
+
+        self.assertEqual(result, get_return)
+        self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/places/deleted')
+        self.cofecms.paged_get.assert_called_once_with(
+            endpoint_url=endpoint_url, diocese_id=123, search_params=None, end_date=None,
+            fields=None, limit=None, offset=50, start_date=None,
+        )
+
     def test_get_contact_fields(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/contact-fields'
         self.cofecms.generate_endpoint_url = mock.Mock(
             spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
         )
 
-        get_return = {'contact': ['id', 'surname']}
+        get_return = [{'contact': ['id', 'surname']}]
         self.cofecms.get = mock.Mock(spec=self.cofecms.get, return_value=get_return)
 
         result = self.cofecms.get_contact_fields(123)
 
         self.assertEqual(result, get_return)
         self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/contact-fields')
+        self.cofecms.get.assert_called_once_with(endpoint_url=endpoint_url, diocese_id=123)
+
+    def test_get_post_fields(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/post-fields'
+        self.cofecms.generate_endpoint_url = mock.Mock(
+            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'contact': ['id', 'surname'], 'place': ['id', 'name']}]
+        self.cofecms.get = mock.Mock(spec=self.cofecms.get, return_value=get_return)
+
+        result = self.cofecms.get_post_fields(123)
+
+        self.assertEqual(result, get_return)
+        self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/post-fields')
+        self.cofecms.get.assert_called_once_with(endpoint_url=endpoint_url, diocese_id=123)
+
+    def test_get_place_fields(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/place-fields'
+        self.cofecms.generate_endpoint_url = mock.Mock(
+            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'place': ['id', 'name']}]
+        self.cofecms.get = mock.Mock(spec=self.cofecms.get, return_value=get_return)
+
+        result = self.cofecms.get_place_fields(123)
+
+        self.assertEqual(result, get_return)
+        self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/place-fields')
+        self.cofecms.get.assert_called_once_with(endpoint_url=endpoint_url, diocese_id=123)
+
+    def test_get_roles(self):
+        endpoint_url = 'https://cmsapi.cofeportal.org/v2/roles'
+        self.cofecms.generate_endpoint_url = mock.Mock(
+            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+        )
+
+        get_return = [{'id': 6714, 'name': '*No ID card'}, {'id': 6682, 'name': 'AA Review'}]
+        self.cofecms.get = mock.Mock(spec=self.cofecms.get, return_value=get_return)
+
+        result = self.cofecms.get_roles(123)
+
+        self.assertEqual(result, get_return)
+        self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/roles')
         self.cofecms.get.assert_called_once_with(endpoint_url=endpoint_url, diocese_id=123)
 
     def test_get__list_response(self):
@@ -207,6 +354,7 @@ class CofeCMSTest(TestCase):
         self.assertEqual(result, get_return)
         self.assertEqual(result.total_count, 678)
         self.assertEqual(result.offset, 0)
+        self.assertEqual(result.limit, 100)
         self.cofecms.get.assert_called_once_with(
             endpoint_url=endpoint_url, diocese_id=123, search_params=None, offset=0, limit=100,
         )
