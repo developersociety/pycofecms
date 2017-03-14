@@ -4,7 +4,8 @@ from unittest import TestCase, mock
 import httpretty
 import requests
 
-from cofecms.api import CofeCMS, CofeCMSResult
+import cofecms
+from cofecms.api import CofeCMS, CofeCMSResult, ContactData
 
 
 class CofeCMSTest(TestCase):
@@ -596,3 +597,71 @@ class CofeCMSResultTest(TestCase):
             search_params={'keyword': 'smith'}, offset=15, limit=5,
             fields=['forenames', 'surname'],
         )
+
+
+class ContactDataTest(TestCase):
+
+    def test_init(self):
+        raw_contact_data = {'wibble': 'wobble'}
+        contact_data = ContactData(raw_contact_data)
+        self.assertEqual(contact_data.contact_data, raw_contact_data)
+        self.assertEqual(contact_data.max_access_level, cofecms.PRIVACY_SETTING_PUBLIC)
+
+        contact_data = ContactData(
+            raw_contact_data, max_access_level=cofecms.PRIVACY_SETTING_PRIVATE,
+        )
+        self.assertEqual(contact_data.max_access_level, cofecms.PRIVACY_SETTING_PRIVATE)
+
+    def test_get_item__public(self):
+        raw_contact_data = {
+            'wibble': 'wobble',  # No privacy settings
+            'public': 'a', 'public_privacy_setting': cofecms.PRIVACY_SETTING_PUBLIC,
+            'diocese': 'b', 'diocese_privacy_setting': cofecms.PRIVACY_SETTING_DIOCESE_ONLY,
+            'private': 'c', 'private_privacy_setting': cofecms.PRIVACY_SETTING_PRIVATE,
+        }
+        contact_data = ContactData(
+            raw_contact_data, max_access_level=cofecms.PRIVACY_SETTING_PUBLIC,
+        )
+
+        self.assertEqual(contact_data['wibble'], 'wobble')
+        with self.assertRaises(KeyError):
+            self.assertEqual(contact_data['bad_key'], None)
+        self.assertEqual(contact_data['public'], 'a')
+        self.assertEqual(contact_data['diocese'], None)
+        self.assertEqual(contact_data['private'], None)
+
+    def test_get_item__diocese(self):
+        raw_contact_data = {
+            'wibble': 'wobble',  # No privacy settings
+            'public': 'a', 'public_privacy_setting': cofecms.PRIVACY_SETTING_PUBLIC,
+            'diocese': 'b', 'diocese_privacy_setting': cofecms.PRIVACY_SETTING_DIOCESE_ONLY,
+            'private': 'c', 'private_privacy_setting': cofecms.PRIVACY_SETTING_PRIVATE,
+        }
+        contact_data = ContactData(
+            raw_contact_data, max_access_level=cofecms.PRIVACY_SETTING_DIOCESE_ONLY,
+        )
+
+        self.assertEqual(contact_data['wibble'], 'wobble')
+        with self.assertRaises(KeyError):
+            self.assertEqual(contact_data['bad_key'], None)
+        self.assertEqual(contact_data['public'], 'a')
+        self.assertEqual(contact_data['diocese'], 'b')
+        self.assertEqual(contact_data['private'], None)
+
+    def test_get_item__private(self):
+        raw_contact_data = {
+            'wibble': 'wobble',  # No privacy settings
+            'public': 'a', 'public_privacy_setting': cofecms.PRIVACY_SETTING_PUBLIC,
+            'diocese': 'b', 'diocese_privacy_setting': cofecms.PRIVACY_SETTING_DIOCESE_ONLY,
+            'private': 'c', 'private_privacy_setting': cofecms.PRIVACY_SETTING_PRIVATE,
+        }
+        contact_data = ContactData(
+            raw_contact_data, max_access_level=cofecms.PRIVACY_SETTING_PRIVATE,
+        )
+
+        self.assertEqual(contact_data['wibble'], 'wobble')
+        with self.assertRaises(KeyError):
+            self.assertEqual(contact_data['bad_key'], None)
+        self.assertEqual(contact_data['public'], 'a')
+        self.assertEqual(contact_data['diocese'], 'b')
+        self.assertEqual(contact_data['private'], 'c')
