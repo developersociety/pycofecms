@@ -354,6 +354,7 @@ class CofeCMSTest(TestCase):
         self.assertEqual(result, get_return)
         self.assertEqual(result.total_count, 678)
         self.assertEqual(result.offset, 0)
+        self.assertEqual(result.limit, 100)
         self.cofecms.get.assert_called_once_with(
             endpoint_url=endpoint_url, diocese_id=123, search_params=None, offset=0, limit=100,
         )

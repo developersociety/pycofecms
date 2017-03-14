@@ -405,7 +405,7 @@ class CofeCMS(object):
             and will also add the total_count attribute from the 'X-Total-Count' header.
         """
         basic_params['offset'] = basic_params.get('offset', 0)
-        basic_params['limit'] = basic_params.get('limit', CofeCMS.DEFAULT_LIMIT)
+        basic_params['limit'] = basic_params.get('limit', False) or CofeCMS.DEFAULT_LIMIT
 
         result = self.get(endpoint_url, diocese_id, search_params, **basic_params)
 
