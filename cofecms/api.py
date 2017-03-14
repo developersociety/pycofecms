@@ -494,7 +494,7 @@ class CofeCMS(object):
         """
         search_params = search_params or {}
         prepared_search_params = self._prepare_search_params(
-            diocese_id=diocese_id, **search_params,
+            diocese_id=diocese_id, **search_params
         )
 
         json_search_params = self.encode_search_params(prepared_search_params)
