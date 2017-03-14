@@ -387,12 +387,27 @@ class CofeCMSResult(list):
         self.__dict__.update(kwargs)
 
     def all(self):
+        """
+        Retrieve the data for all pages of results from the inital query.
+
+        Warning: Can be quite slow to run as a request will be made for each page. Suggest reducing
+        the number of pages by increasing the "limit" when performing the initial query.
+
+        Returns:
+            A list of result data (which are usually dicts).
+        """
         data = []
         for page in self.pages_generator():
             data = data + page
         return data
 
     def pages_generator(self):
+        """
+        A generator to iterate through all the pages in the initial query.
+
+        Warning: Can be quite slow to run as a request will be made for each page. Suggest reducing
+        the number of pages by increasing the "limit" when performing the initial query.
+        """
         for current_page_num in range(0, self.total_pages):
             if current_page_num == 0:
                 # No need to get current results again
@@ -402,6 +417,15 @@ class CofeCMSResult(list):
             yield current_page_data
 
     def get_data_for_page(self, page_num):
+        """
+        Retrieve the data for a specific page in the initial query.
+
+        Args:
+            page_num: The number of the page to get. Zero indexed.
+
+        Returns:
+            A CofeCMSResult object, populated with data for the requested page.
+        """
         offset = page_num * self.limit
         result = self.api_obj.paged_get(
             endpoint_url=self.endpoint_url, diocese_id=self.diocese_id,
@@ -412,4 +436,13 @@ class CofeCMSResult(list):
 
     @property
     def total_pages(self):
+        """
+        Calculate how many pages of results are in the entire result set.
+
+        The COFE CMS API tends to not give an accurate "total_count" of results. So this should be
+        seen as calculating the maximum number of pages.
+
+        Returns:
+            An int of of the number of pages.
+        """
         return math.floor(self.total_count / self.limit) + 1
