@@ -6,6 +6,25 @@ from hashlib import sha256
 
 import requests
 
+PLACE_TYPE_ARCHDEACONRY = 1
+PLACE_TYPE_BENEFICE = 2
+PLACE_TYPE_CHURCH = 3
+PLACE_TYPE_DEANERY = 4
+PLACE_TYPE_DIOCESE = 5
+PLACE_TYPE_EXTRA_PAROCHIAL = 6
+PLACE_TYPE_NONPAROCHIAL = 7
+PLACE_TYPE_PARISH = 8
+PLACE_TYPE_SCHOOL = 9
+PLACE_TYPE_DISTRICT = 10
+PLACE_TYPE_OFFICE = 12
+PLACE_TYPE_CLERGY_RESIDENCE = 13
+PLACE_TYPE_GROUP = 14
+PLACE_TYPE_HALL = 15
+
+PRIVACY_SETTING_PRIVATE = 2
+PRIVACY_SETTING_DIOCESE_ONLY = 1
+PRIVACY_SETTING_PUBLIC = 0
+
 
 class CofeCMS(object):
     BASE_URL = 'https://cmsapi.cofeportal.org'
@@ -475,7 +494,7 @@ class CofeCMS(object):
         """
         search_params = search_params or {}
         prepared_search_params = self._prepare_search_params(
-            diocese_id=diocese_id, **search_params,
+            diocese_id=diocese_id, **search_params
         )
 
         json_search_params = self.encode_search_params(prepared_search_params)
@@ -654,3 +673,33 @@ class CofeCMSResult(list):
             An int of of the number of pages.
         """
         return math.floor(self.total_count / self.limit) + 1
+
+
+class ContactData(object):
+    """
+    A wrapper to provide easy access to Worthers contact data, whilst taking into account privacy
+    settings.
+    """
+    def __init__(self, contact_data, max_access_level=PRIVACY_SETTING_PUBLIC):
+        self.contact_data = contact_data
+        self.max_access_level = max_access_level
+
+    def __getitem__(self, key):
+        """
+        Will return the value if there's no privacy settings found, or if the privacy settings
+        allow it.
+
+        If privacy settings say no, then will return None.
+
+        If the key is not found, will raise a KeyError.
+        """
+        privacy_key = '{key}_privacy_setting'.format(key=key)
+
+        if privacy_key not in self.contact_data.keys():
+            # Not a value which has privacy settings
+            return self.contact_data[key]
+
+        if self.contact_data[privacy_key] <= self.max_access_level:
+            return self.contact_data[key]
+
+        return None
