@@ -208,7 +208,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass
 # [howto/manual]).
 latex_documents = [
-    ('index', 'cofecms.tex',
+    ('index', 'pycofecms.tex',
      u'pycofecms Documentation',
      u'Blanc Ltd.', 'manual'),
 ]
@@ -239,7 +239,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'cofecms',
+    ('index', 'pycofecms',
      u'pycofecms Documentation',
      [u'Blanc Ltd.'], 1)
 ]
@@ -254,10 +254,10 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'cofecms',
+    ('index', 'pycofecms',
      u'pycofecms Documentation',
      u'Blanc Ltd.',
-     'cofecms',
+     'pycofecms',
      'One line description of project.',
      'Miscellaneous'),
 ]

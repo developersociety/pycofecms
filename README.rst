@@ -3,19 +3,12 @@ Church of England CMS API Client
 ================================
 
 
-.. image:: https://img.shields.io/pypi/v/cofecms.svg
-        :target: https://pypi.python.org/pypi/cofecms
+.. image:: https://img.shields.io/pypi/v/pycofecms.svg
+        :target: https://pypi.python.org/pypi/pycofecms
 
-.. image:: https://img.shields.io/travis/blancltd/cofecms.svg
-        :target: https://travis-ci.org/blancltd/cofecms
-
-.. image:: https://readthedocs.org/projects/cofecms/badge/?version=latest
-        :target: https://cofecms.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/pycofecms/badge/?version=latest
+        :target: https://pycofecms.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
-
-.. image:: https://pyup.io/repos/github/blancltd/cofecms/shield.svg
-     :target: https://pyup.io/repos/github/blancltd/cofecms/
-     :alt: Updates
 
 
 Before you start, make sure you have access credentials for the Church of England CMS API. You will
@@ -27,7 +20,7 @@ receive your access credentials.
 
 
 * Free software: BSD license
-* Documentation: https://cofecms.readthedocs.io.
+* Documentation: https://pycofecms.readthedocs.io
 
 
 Features
