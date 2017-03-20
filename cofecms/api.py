@@ -447,7 +447,7 @@ class CofeCMS(object):
             endpoint_url: The absolute URL for the endpoint to use. For example:
                 https://cmsapi.cofeportal.org/v2/contacts
             request_params: A dict containing the GET params for this request. Will be URL encoded
-            for you.
+                for you.
 
         Returns:
             An unmolested requests.Result object.
