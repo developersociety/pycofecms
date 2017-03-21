@@ -1,6 +1,10 @@
 import cofecms.api
 from cofecms.api import CofeCMS  # noqa
 
+__author__ = 'Blanc Ltd.'
+__email__ = 'studio@blanc.ltd.uk'
+__version__ = '0.1.0'
+
 PLACE_TYPE_ARCHDEACONRY = cofecms.api.PLACE_TYPE_ARCHDEACONRY
 PLACE_TYPE_BENEFICE = cofecms.api.PLACE_TYPE_BENEFICE
 PLACE_TYPE_CHURCH = cofecms.api.PLACE_TYPE_CHURCH

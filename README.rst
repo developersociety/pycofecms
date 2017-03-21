@@ -2,7 +2,14 @@
 Church of England CMS API Client
 ================================
 
-https://cmsapi.cofeportal.org/
+
+.. image:: https://img.shields.io/pypi/v/pycofecms.svg
+        :target: https://pypi.python.org/pypi/pycofecms
+
+.. image:: https://readthedocs.org/projects/pycofecms/badge/?version=latest
+        :target: https://pycofecms.readthedocs.io/en/latest/?badge=latest
+        :alt: Documentation Status
+
 
 Before you start, make sure you have access credentials for the Church of England CMS API. You will
 need a valid `API_ID` and `API_KEY`. See https://cmsapi.cofeportal.org/security for more
@@ -10,6 +17,18 @@ information about this.
 
 Most of the endpoints also require a `diocese_id`. You should be supplied with this when you
 receive your access credentials.
+
+
+* Free software: BSD license
+* Documentation: https://pycofecms.readthedocs.io
+
+
+Features
+========
+
+* Python client for the CofE CMS API (https://cmsapi.cofeportal.org/)
+* Python 3.5
+* 100% test coverage
 
 
 Quick Start
