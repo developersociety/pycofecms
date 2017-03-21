@@ -20,9 +20,9 @@ test_requirements = [
 setup(
     name='pycofecms',
     version='0.1.0',
-    description="Church of England CMS API Client",
+    description='Church of England CMS API Client',
     long_description=readme + '\n\n' + history,
-    author="Blanc Ltd.",
+    author='Blanc Ltd.',
     author_email='studio@blanc.ltd.uk',
     url='https://github.com/blancltd/pycofecms',
     packages=[
@@ -32,7 +32,7 @@ setup(
                  'cofecms'},
     include_package_data=True,
     install_requires=requirements,
-    license="BSD license",
+    license='BSD license',
     zip_safe=False,
     keywords='cofecms',
     classifiers=[
