@@ -41,7 +41,7 @@ test: ## Run unit and integration tests.
 test: pytest-test
 
 test-report: ## Run and report on unit and integration tests.
-test-report: pytest-test coverage-report
+test-report: coverage-clean test coverage-report
 
 deploy: ## Deploy this project to demo or live.
 deploy:
@@ -171,7 +171,7 @@ help-display:
 
 
 # Sphinx
-sphinx-html: ## generate Sphinx HTML documentation, including API docs
+sphinx-html:
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 
