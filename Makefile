@@ -1,87 +1,181 @@
-.PHONY: clean clean-test clean-pyc clean-build docs help
+SHELL=/bin/bash
 .DEFAULT_GOAL := help
-define BROWSER_PYSCRIPT
-import os, webbrowser, sys
-try:
-	from urllib import pathname2url
-except:
-	from urllib.request import pathname2url
-
-webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
-endef
-export BROWSER_PYSCRIPT
-
-define PRINT_HELP_PYSCRIPT
-import re, sys
-
-for line in sys.stdin:
-	match = re.match(r'^([a-zA-Z_-]+):.*?## (.*)$$', line)
-	if match:
-		target, help = match.groups()
-		print("%-20s %s" % (target, help))
-endef
-export PRINT_HELP_PYSCRIPT
-BROWSER := python -c "$$BROWSER_PYSCRIPT"
-
-help:
-	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
-
-clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
 
-clean-build: ## remove build artifacts
+# ---------------------------------
+# Project specific targets
+# ---------------------------------
+#
+# Add any targets specific to the current project in here.
+
+
+
+# -------------------------------
+# Common targets for Dev projects
+# -------------------------------
+#
+# Edit these targets so they work as expected on the current project.
+#
+# Remember there may be other tools which use these targets, so if a target is not suitable for
+# the current project, then keep the target and simply make it do nothing.
+
+help: ## This help dialog.
+help: help-display
+
+clean: ## Remove unneeded files generated from the various build tasks.
+clean: build-clean coverage-clean
+
+reset: ## Reset your local environment. Useful after switching branches, etc.
+reset: venv-check venv-wipe install-local
+
+check: ## Check for any obvious errors in the project's setup.
+check: pipdeptree-check
+
+format: ## Run this project's code formatters.
+format: yapf-format isort-format
+
+lint: ## Lint the project.
+lint: yapf-lint isort-lint flake8-lint
+
+test: ## Run unit and integration tests.
+test: pytest-test
+
+test-report: ## Run and report on unit and integration tests.
+test-report: coverage-clean test coverage-report
+
+deploy: ## Deploy this project to demo or live.
+deploy:
+	@echo "Not a deployable project. Maybe you want to do a 'make release' instead?"
+
+release: ## Package and release this project to PyPi.
+release: clean build-release
+
+dist: ## Builds source and wheel package
+dist: clean build-dist
+
+docs: ## Build the docs
+docs: sphinx-apidoc sphinx-html
+
+
+
+# ---------------
+# Utility targets
+# ---------------
+#
+# Targets which are used by the common targets. You likely want to customise these per project,
+# to ensure they're pointing at the correct directories, etc.
+
+# Build
+build-clean:
 	rm -fr build/
 	rm -fr dist/
 	rm -fr .eggs/
 	find . -name '*.egg-info' -exec rm -fr {} +
 	find . -name '*.egg' -exec rm -f {} +
 
-clean-pyc: ## remove Python file artifacts
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
-	find . -name '__pycache__' -exec rm -fr {} +
-
-clean-test: ## remove test and coverage artifacts
-	rm -fr .tox/
-	rm -f .coverage
-	rm -fr htmlcov/
-
-lint: ## check style with flake8
-	flake8 cofecms tests
-
-test: ## run tests quickly with the default Python
-	py.test
-
-
-test-all: ## run tests on every Python version with tox
-	tox
-
-coverage: ## check code coverage quickly with the default Python
-	coverage run --source cofecms -m pytest
-
-		coverage report -m
-		coverage html
-		$(BROWSER) htmlcov/index.html
-
-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/pycofecms.rst
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ cofecms
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-
-servedocs: docs ## compile the docs watching for changes
-	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
-
-release: clean ## package and upload a release
+build-release:
+	@echo
+	@echo "This will package and release this project to PyPi."
+	@echo
+	@echo "A checklist before you continue:"
+	@echo
+	@echo " - have you ran 'versionbump'?"
+	@echo " - have you pushed the commit and tag created by 'versionbump'?"
+	@echo " - are you sure the project is in a state to be released?"
+	@echo
+	@read -p "Press <enter> to continue. Or <ctrl>-c to quit and address the above points."
 	python setup.py sdist upload
 	python setup.py bdist_wheel upload
 
-dist: clean ## builds source and wheel package
+build-dist:
 	python setup.py sdist
 	python setup.py bdist_wheel
 	ls -l dist
 
-install: clean ## install the package to the active Python's site-packages
-	python setup.py install
+
+# Virtual Environments
+venv-check:
+ifndef VIRTUAL_ENV
+	$(error Must be in a virtualenv)
+endif
+
+venv-wipe: venv-check
+	if ! pip list --format=freeze | grep -v "^appdirs=\|^distribute=\|^packaging=\|^pip=\|^pyparsing=\|^setuptools=\|^six=\|^wheel=" | xargs pip uninstall -y; then \
+	    echo "Nothing to remove"; \
+	fi
+
+
+# Installs
+install-local: pip-install-local
+
+
+# Pip
+pip-install-local: venv-check
+	pip install -r requirements/local.txt
+
+
+# ISort
+isort-version:
+	isort --version
+
+isort-lint: isort-version
+	isort --recursive --check-only --diff cofecms
+
+isort-format: isort-version
+	isort --recursive cofecms
+
+
+# Flake8
+flake8-lint:
+	flake8 cofecms
+
+
+# Pytest
+pytest-test:
+	coverage run --source cofecms -m pytest
+
+
+# Coverage
+coverage-report: coverage-html coverage-xml
+	coverage report --show-missing
+
+coverage-html:
+	coverage html
+
+coverage-xml:
+	coverage xml
+
+coverage-clean:
+	rm -rf htmlcov
+	rm -rf reports
+	rm -f .coverage
+
+
+# YAPF
+yapf-lint:
+	yapf_lint_output="`yapf -r -p -d --style .style.yapf cofecms tests`" && \
+	if [[ $$yapf_lint_output ]]; then echo -e "$$yapf_lint_output"; exit 1; fi
+
+yapf-format:
+	yapf -r -i -p --style .style.yapf cofecms tests
+
+
+#pipdeptree
+pipdeptree-check:
+	@pipdeptree --warn fail > /dev/null
+
+
+# Help
+help-display:
+	@awk '/^[[:alnum:]-]*: ##/ { split($$0, x, "##"); printf "%20s%s\n", x[1], x[2]; }' $(MAKEFILE_LIST)
+
+
+# Sphinx
+sphinx-html:
+	$(MAKE) -C docs clean
+	$(MAKE) -C docs html
+
+sphinx-apidoc:
+	rm -f docs/pycofecms.rst
+	rm -f docs/modules.rst
+	sphinx-apidoc -o docs/ cofecms

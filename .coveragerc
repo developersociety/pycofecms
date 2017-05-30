@@ -1,6 +1,8 @@
 [run]
 branch = True
-omit = *tests/*
+omit =
+    .tox/*
+    tests/*
 
 [xml]
 output = reports/coverage.xml

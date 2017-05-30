@@ -32,13 +32,13 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/blancltd/pycofecms
+    $ git clone git://github.com/developersociety/pycofecms
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/blancltd/pycofecms/tarball/master
+    $ curl  -OL https://github.com/developersociety/pycofecms/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/blancltd/pycofecms
-.. _tarball: https://github.com/blancltd/pycofecms/tarball/master
+.. _Github repo: https://github.com/developersociety/pycofecms
+.. _tarball: https://github.com/developersociety/pycofecms/tarball/master

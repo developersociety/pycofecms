@@ -13,8 +13,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
 import os
+import sys
 
 # If extensions (or modules to document with autodoc) are in another
 # directory, add these directories to sys.path here. If the directory is
@@ -30,8 +30,7 @@ project_root = os.path.dirname(cwd)
 # This lets us ensure that the source package is imported, and that its
 # version is used.
 sys.path.insert(0, project_root)
-
-import cofecms
+import cofecms  # isort:skip
 
 # -- General configuration ---------------------------------------------
 
@@ -56,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pycofecms'
-copyright = u"2017, Blanc Ltd."
+copyright = u"2017, The Developer Society"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -210,7 +209,7 @@ latex_elements = {
 latex_documents = [
     ('index', 'pycofecms.tex',
      u'pycofecms Documentation',
-     u'Blanc Ltd.', 'manual'),
+     u'The Developer Society', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at
@@ -241,7 +240,7 @@ latex_documents = [
 man_pages = [
     ('index', 'pycofecms',
      u'pycofecms Documentation',
-     [u'Blanc Ltd.'], 1)
+     [u'The Developer Society'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -256,7 +255,7 @@ man_pages = [
 texinfo_documents = [
     ('index', 'pycofecms',
      u'pycofecms Documentation',
-     u'Blanc Ltd.',
+     u'The Developer Society',
      'pycofecms',
      'One line description of project.',
      'Miscellaneous'),
