@@ -22,9 +22,9 @@ setup(
     version='0.1.0',
     description='Church of England CMS API Client',
     long_description=readme + '\n\n' + history,
-    author='Blanc Ltd.',
-    author_email='studio@blanc.ltd.uk',
-    url='https://github.com/blancltd/pycofecms',
+    author=' Ltd.',
+    author_email='studio@dev.ngo',
+    url='https://github.com/developersociety/pycofecms',
     packages=[
         'pycofecms',
     ],
