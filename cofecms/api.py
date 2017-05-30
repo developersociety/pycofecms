@@ -55,8 +55,14 @@ class CofeCMS(object):
         self._diocese_id = value
 
     def get_contacts(
-        self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
-        offset=None, start_date=None,
+            self,
+            diocese_id=None,
+            search_params=None,
+            end_date=None,
+            fields=None,
+            limit=None,
+            offset=None,
+            start_date=None,
     ):
         """
         Retrieve a collection of contact records.
@@ -81,8 +87,14 @@ class CofeCMS(object):
         """
         endpoint_url = self.generate_endpoint_url('/v2/contacts')
         result = self.paged_get(
-            endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
-            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
+            endpoint_url=endpoint_url,
+            diocese_id=diocese_id,
+            search_params=search_params,
+            end_date=end_date,
+            fields=fields,
+            limit=limit,
+            offset=offset,
+            start_date=start_date,
         )
         return result
 
@@ -104,8 +116,14 @@ class CofeCMS(object):
         return result
 
     def get_deleted_contacts(
-        self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
-        offset=None, start_date=None,
+            self,
+            diocese_id=None,
+            search_params=None,
+            end_date=None,
+            fields=None,
+            limit=None,
+            offset=None,
+            start_date=None,
     ):
         """
         Retrieve a collection of deleted contact records.
@@ -129,14 +147,26 @@ class CofeCMS(object):
         """
         endpoint_url = self.generate_endpoint_url('/v2/contacts/deleted')
         result = self.paged_get(
-            endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
-            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
+            endpoint_url=endpoint_url,
+            diocese_id=diocese_id,
+            search_params=search_params,
+            end_date=end_date,
+            fields=fields,
+            limit=limit,
+            offset=offset,
+            start_date=start_date,
         )
         return result
 
     def get_posts(
-        self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
-        offset=None, start_date=None,
+            self,
+            diocese_id=None,
+            search_params=None,
+            end_date=None,
+            fields=None,
+            limit=None,
+            offset=None,
+            start_date=None,
     ):
         """
         Retrieve a collection of records containing post, place, contact and role fields.
@@ -161,8 +191,14 @@ class CofeCMS(object):
         """
         endpoint_url = self.generate_endpoint_url('/v2/posts')
         result = self.paged_get(
-            endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
-            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
+            endpoint_url=endpoint_url,
+            diocese_id=diocese_id,
+            search_params=search_params,
+            end_date=end_date,
+            fields=fields,
+            limit=limit,
+            offset=offset,
+            start_date=start_date,
         )
         return result
 
@@ -184,8 +220,14 @@ class CofeCMS(object):
         return result
 
     def get_deleted_posts(
-        self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
-        offset=None, start_date=None,
+            self,
+            diocese_id=None,
+            search_params=None,
+            end_date=None,
+            fields=None,
+            limit=None,
+            offset=None,
+            start_date=None,
     ):
         """
         Retrieve a collection of deleted records containing post, place, contact and role fields.
@@ -209,14 +251,26 @@ class CofeCMS(object):
         """
         endpoint_url = self.generate_endpoint_url('/v2/posts/deleted')
         result = self.paged_get(
-            endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
-            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
+            endpoint_url=endpoint_url,
+            diocese_id=diocese_id,
+            search_params=search_params,
+            end_date=end_date,
+            fields=fields,
+            limit=limit,
+            offset=offset,
+            start_date=start_date,
         )
         return result
 
     def get_places(
-        self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
-        offset=None, start_date=None,
+            self,
+            diocese_id=None,
+            search_params=None,
+            end_date=None,
+            fields=None,
+            limit=None,
+            offset=None,
+            start_date=None,
     ):
         """
         Retrieve a collection of place records.
@@ -241,8 +295,14 @@ class CofeCMS(object):
         """
         endpoint_url = self.generate_endpoint_url('/v2/places')
         result = self.paged_get(
-            endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
-            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
+            endpoint_url=endpoint_url,
+            diocese_id=diocese_id,
+            search_params=search_params,
+            end_date=end_date,
+            fields=fields,
+            limit=limit,
+            offset=offset,
+            start_date=start_date,
         )
         return result
 
@@ -264,8 +324,14 @@ class CofeCMS(object):
         return result
 
     def get_deleted_places(
-        self, diocese_id=None, search_params=None, end_date=None, fields=None, limit=None,
-        offset=None, start_date=None,
+            self,
+            diocese_id=None,
+            search_params=None,
+            end_date=None,
+            fields=None,
+            limit=None,
+            offset=None,
+            start_date=None,
     ):
         """
         Retrieve a collection of deleted place records.
@@ -289,8 +355,14 @@ class CofeCMS(object):
         """
         endpoint_url = self.generate_endpoint_url('/v2/places/deleted')
         result = self.paged_get(
-            endpoint_url=endpoint_url, diocese_id=diocese_id, search_params=search_params,
-            end_date=end_date, fields=fields, limit=limit, offset=offset, start_date=start_date,
+            endpoint_url=endpoint_url,
+            diocese_id=diocese_id,
+            search_params=search_params,
+            end_date=end_date,
+            fields=fields,
+            limit=limit,
+            offset=offset,
+            start_date=start_date,
         )
         return result
 
@@ -432,11 +504,11 @@ class CofeCMS(object):
 
         result.offset = basic_params['offset']
         if 'offset' in result.basic_params:
-            del(result.basic_params['offset'])
+            del (result.basic_params['offset'])
 
         result.limit = basic_params['limit']
         if 'limit' in result.basic_params:
-            del(result.basic_params['limit'])
+            del (result.basic_params['limit'])
         return result
 
     def do_request(self, endpoint_url, request_params):
@@ -587,13 +659,10 @@ class CofeCMS(object):
 
         # According to docs, only known Date fields are start_date and end_date
         if basic_params_filtered.get('start_date', False):
-            basic_params_filtered['start_date'] = self.format_date(
-                basic_params_filtered['start_date']
-            )
+            basic_params_filtered['start_date'
+                                  ] = self.format_date(basic_params_filtered['start_date'])
         if basic_params_filtered.get('end_date', False):
-            basic_params_filtered['end_date'] = self.format_date(
-                basic_params_filtered['end_date']
-            )
+            basic_params_filtered['end_date'] = self.format_date(basic_params_filtered['end_date'])
 
         # Json encode the fields dictionary
         if basic_params_filtered.get('fields', False):
@@ -603,6 +672,7 @@ class CofeCMS(object):
 
 
 class CofeCMSResult(list):
+
     def __new__(self, *args, **kwargs):
         return super().__new__(self, args, kwargs)
 
@@ -655,9 +725,12 @@ class CofeCMSResult(list):
         """
         offset = page_num * self.limit
         result = self.api_obj.paged_get(
-            endpoint_url=self.endpoint_url, diocese_id=self.diocese_id,
-            search_params=self.search_params, offset=offset, limit=self.limit,
-            **self.basic_params,
+            endpoint_url=self.endpoint_url,
+            diocese_id=self.diocese_id,
+            search_params=self.search_params,
+            offset=offset,
+            limit=self.limit,
+            **self.basic_params
         )
         return result
 
@@ -680,6 +753,7 @@ class ContactData(object):
     A wrapper to provide easy access to Worthers contact data, whilst taking into account privacy
     settings.
     """
+
     def __init__(self, contact_data, max_access_level=PRIVACY_SETTING_PUBLIC):
         self.contact_data = contact_data
         self.max_access_level = max_access_level

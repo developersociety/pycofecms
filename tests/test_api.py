@@ -34,7 +34,8 @@ class CofeCMSTest(TestCase):
     def test_get_contacts(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'wibble': 'wobble'}]
@@ -45,14 +46,21 @@ class CofeCMSTest(TestCase):
         self.assertEqual(result, get_return)
         self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/contacts')
         self.cofecms.paged_get.assert_called_once_with(
-            endpoint_url, diocese_id=None, search_params=None, end_date=None, fields=None,
-            limit=None, offset=None, start_date=None,
+            endpoint_url,
+            diocese_id=None,
+            search_params=None,
+            end_date=None,
+            fields=None,
+            limit=None,
+            offset=None,
+            start_date=None,
         )
 
     def test_get_contacts__with_args(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'wibble': 'wobble'}]
@@ -61,22 +69,33 @@ class CofeCMSTest(TestCase):
         end_date = datetime.datetime.now()
         start_date = datetime.datetime.now()
         result = self.cofecms.get_contacts(
-            diocese_id=123, search_params={'some_key': 'some_value'}, end_date=end_date,
-            fields={'contact': ['surname']}, limit=10, offset=50, start_date=start_date,
+            diocese_id=123,
+            search_params={'some_key': 'some_value'},
+            end_date=end_date,
+            fields={'contact': ['surname']},
+            limit=10,
+            offset=50,
+            start_date=start_date,
         )
 
         self.assertEqual(result, get_return)
         self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/contacts')
         self.cofecms.paged_get.assert_called_once_with(
-            endpoint_url, diocese_id=123, search_params={'some_key': 'some_value'},
-            end_date=end_date, fields={'contact': ['surname']}, limit=10, offset=50,
+            endpoint_url,
+            diocese_id=123,
+            search_params={'some_key': 'some_value'},
+            end_date=end_date,
+            fields={'contact': ['surname']},
+            limit=10,
+            offset=50,
             start_date=start_date,
         )
 
     def test_get_contact(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts/123'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'wibble': 'wobble'}]
@@ -91,7 +110,8 @@ class CofeCMSTest(TestCase):
     def test_get_deleted_contacts(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/contacts/deleted'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'wibble': 'wobble'}]
@@ -102,14 +122,21 @@ class CofeCMSTest(TestCase):
         self.assertEqual(result, get_return)
         self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/contacts/deleted')
         self.cofecms.paged_get.assert_called_once_with(
-            endpoint_url=endpoint_url, diocese_id=123, search_params=None, end_date=None,
-            fields=None, limit=None, offset=50, start_date=None,
+            endpoint_url=endpoint_url,
+            diocese_id=123,
+            search_params=None,
+            end_date=None,
+            fields=None,
+            limit=None,
+            offset=50,
+            start_date=None,
         )
 
     def test_get_posts(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/posts'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'wibble': 'wobble'}]
@@ -120,14 +147,21 @@ class CofeCMSTest(TestCase):
         self.assertEqual(result, get_return)
         self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/posts')
         self.cofecms.paged_get.assert_called_once_with(
-            endpoint_url, diocese_id=None, search_params=None, end_date=None, fields=None,
-            limit=None, offset=None, start_date=None,
+            endpoint_url,
+            diocese_id=None,
+            search_params=None,
+            end_date=None,
+            fields=None,
+            limit=None,
+            offset=None,
+            start_date=None,
         )
 
     def test_get_post(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/posts/123'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'wibble': 'wobble'}]
@@ -142,7 +176,8 @@ class CofeCMSTest(TestCase):
     def test_get_deleted_posts(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/posts/deleted'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'wibble': 'wobble'}]
@@ -153,14 +188,21 @@ class CofeCMSTest(TestCase):
         self.assertEqual(result, get_return)
         self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/posts/deleted')
         self.cofecms.paged_get.assert_called_once_with(
-            endpoint_url=endpoint_url, diocese_id=123, search_params=None, end_date=None,
-            fields=None, limit=None, offset=50, start_date=None,
+            endpoint_url=endpoint_url,
+            diocese_id=123,
+            search_params=None,
+            end_date=None,
+            fields=None,
+            limit=None,
+            offset=50,
+            start_date=None,
         )
 
     def test_get_places(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/places'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'wibble': 'wobble'}]
@@ -171,14 +213,21 @@ class CofeCMSTest(TestCase):
         self.assertEqual(result, get_return)
         self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/places')
         self.cofecms.paged_get.assert_called_once_with(
-            endpoint_url, diocese_id=None, search_params=None, end_date=None, fields=None,
-            limit=None, offset=None, start_date=None,
+            endpoint_url,
+            diocese_id=None,
+            search_params=None,
+            end_date=None,
+            fields=None,
+            limit=None,
+            offset=None,
+            start_date=None,
         )
 
     def test_get_place(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/places/123'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'wibble': 'wobble'}]
@@ -193,7 +242,8 @@ class CofeCMSTest(TestCase):
     def test_get_deleted_places(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/places/deleted'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'wibble': 'wobble'}]
@@ -204,14 +254,21 @@ class CofeCMSTest(TestCase):
         self.assertEqual(result, get_return)
         self.cofecms.generate_endpoint_url.assert_called_once_with('/v2/places/deleted')
         self.cofecms.paged_get.assert_called_once_with(
-            endpoint_url=endpoint_url, diocese_id=123, search_params=None, end_date=None,
-            fields=None, limit=None, offset=50, start_date=None,
+            endpoint_url=endpoint_url,
+            diocese_id=123,
+            search_params=None,
+            end_date=None,
+            fields=None,
+            limit=None,
+            offset=50,
+            start_date=None,
         )
 
     def test_get_contact_fields(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/contact-fields'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'contact': ['id', 'surname']}]
@@ -226,7 +283,8 @@ class CofeCMSTest(TestCase):
     def test_get_post_fields(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/post-fields'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'contact': ['id', 'surname'], 'place': ['id', 'name']}]
@@ -241,7 +299,8 @@ class CofeCMSTest(TestCase):
     def test_get_place_fields(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/place-fields'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'place': ['id', 'name']}]
@@ -256,7 +315,8 @@ class CofeCMSTest(TestCase):
     def test_get_roles(self):
         endpoint_url = 'https://cmsapi.cofeportal.org/v2/roles'
         self.cofecms.generate_endpoint_url = mock.Mock(
-            spec=self.cofecms.generate_endpoint_url, return_value=endpoint_url,
+            spec=self.cofecms.generate_endpoint_url,
+            return_value=endpoint_url,
         )
 
         get_return = [{'id': 6714, 'name': '*No ID card'}, {'id': 6682, 'name': 'AA Review'}]
@@ -271,11 +331,14 @@ class CofeCMSTest(TestCase):
     def test_get__list_response(self):
         request_params = {'api_id': 'some_api_id', 'data': '{"json_key": "json_value"}'}
         self.cofecms.generate_request_params = mock.Mock(
-            spec=self.cofecms.generate_request_params, return_value=request_params,
+            spec=self.cofecms.generate_request_params,
+            return_value=request_params,
         )
 
         headers = {
-            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59',
+            'X-Total-Count': '678',
+            'X-Rate-Limit': '60',
+            'X-Rate-Limit-Remaining': '59',
         }
         mock_response = mock.Mock(spec=requests.Response)
         mock_response.headers = headers
@@ -285,8 +348,11 @@ class CofeCMSTest(TestCase):
         )
 
         result = self.cofecms.get(
-            'https://cmsapi.cofeportal.org/v2/some_end_point', diocese_id=123,
-            search_params={'postcode': 'cv1 1aa'}, wibble='wobble', limit=10,
+            'https://cmsapi.cofeportal.org/v2/some_end_point',
+            diocese_id=123,
+            search_params={'postcode': 'cv1 1aa'},
+            wibble='wobble',
+            limit=10,
         )
 
         self.assertEqual(result, [{'some_key': 'some_value'}])
@@ -302,7 +368,10 @@ class CofeCMSTest(TestCase):
         self.assertEqual(result.basic_params, {'wibble': 'wobble', 'limit': 10})
 
         self.cofecms.generate_request_params.assert_called_once_with(
-            diocese_id=123, search_params={'postcode': 'cv1 1aa'}, wibble='wobble', limit=10,
+            diocese_id=123,
+            search_params={'postcode': 'cv1 1aa'},
+            wibble='wobble',
+            limit=10,
         )
         self.cofecms.do_request.assert_called_once_with(
             endpoint_url='https://cmsapi.cofeportal.org/v2/some_end_point',
@@ -312,12 +381,11 @@ class CofeCMSTest(TestCase):
     def test_get__dict_response(self):
         request_params = {'api_id': 'some_api_id', 'data': '{"json_key": "json_value"}'}
         self.cofecms.generate_request_params = mock.Mock(
-            spec=self.cofecms.generate_request_params, return_value=request_params,
+            spec=self.cofecms.generate_request_params,
+            return_value=request_params,
         )
 
-        headers = {
-            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59'
-        }
+        headers = {'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59'}
         mock_response = mock.Mock(spec=requests.Response)
         mock_response.headers = headers
         mock_response.json.return_value = {'a_list': ['some_value']}
@@ -326,14 +394,20 @@ class CofeCMSTest(TestCase):
         )
 
         result = self.cofecms.get(
-            'https://cmsapi.cofeportal.org/v2/some_end_point', diocese_id=123,
-            search_params={'postcode': 'cv1 1aa'}, wibble='wobble', limit=10,
+            'https://cmsapi.cofeportal.org/v2/some_end_point',
+            diocese_id=123,
+            search_params={'postcode': 'cv1 1aa'},
+            wibble='wobble',
+            limit=10,
         )
 
         self.assertEqual(result, [{'a_list': ['some_value']}])
         self.assertEqual(result.response, mock_response)
         self.cofecms.generate_request_params.assert_called_once_with(
-            diocese_id=123, search_params={'postcode': 'cv1 1aa'}, wibble='wobble', limit=10,
+            diocese_id=123,
+            search_params={'postcode': 'cv1 1aa'},
+            wibble='wobble',
+            limit=10,
         )
         self.cofecms.do_request.assert_called_once_with(
             endpoint_url='https://cmsapi.cofeportal.org/v2/some_end_point',
@@ -345,7 +419,9 @@ class CofeCMSTest(TestCase):
 
         get_return = CofeCMSResult([{'contact': ['id', 'surname']}])
         get_return.headers = {
-            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59',
+            'X-Total-Count': '678',
+            'X-Rate-Limit': '60',
+            'X-Rate-Limit-Remaining': '59',
         }
         get_return.basic_params = {'limit': 100, 'offset': 0}
         self.cofecms.get = mock.Mock(spec=self.cofecms.get, return_value=get_return)
@@ -357,7 +433,11 @@ class CofeCMSTest(TestCase):
         self.assertEqual(result.offset, 0)
         self.assertEqual(result.limit, 100)
         self.cofecms.get.assert_called_once_with(
-            endpoint_url=endpoint_url, diocese_id=123, search_params=None, offset=0, limit=100,
+            endpoint_url=endpoint_url,
+            diocese_id=123,
+            search_params=None,
+            offset=0,
+            limit=100,
         )
 
     def test_paged_get__with_offset(self):
@@ -365,13 +445,18 @@ class CofeCMSTest(TestCase):
 
         get_return = CofeCMSResult([{'contact': ['id', 'surname']}])
         get_return.headers = {
-            'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59',
+            'X-Total-Count': '678',
+            'X-Rate-Limit': '60',
+            'X-Rate-Limit-Remaining': '59',
         }
         get_return.basic_params = {}
         self.cofecms.get = mock.Mock(spec=self.cofecms.get, return_value=get_return)
 
         result = self.cofecms.paged_get(
-            endpoint_url=endpoint_url, diocese_id=123, offset=100, limit=500,
+            endpoint_url=endpoint_url,
+            diocese_id=123,
+            offset=100,
+            limit=500,
         )
 
         self.assertEqual(result, get_return)
@@ -379,7 +464,11 @@ class CofeCMSTest(TestCase):
         self.assertEqual(result.offset, 100)
         self.assertEqual(result.limit, 500)
         self.cofecms.get.assert_called_once_with(
-            endpoint_url=endpoint_url, diocese_id=123, search_params=None, offset=100, limit=500,
+            endpoint_url=endpoint_url,
+            diocese_id=123,
+            search_params=None,
+            offset=100,
+            limit=500,
         )
 
     def test_make_endpoint_url(self):
@@ -407,23 +496,29 @@ class CofeCMSTest(TestCase):
         self.cofecms.generate_signature.return_value = generate_signature_return
 
         result = self.cofecms.generate_request_params(
-            diocese_id=123, search_params={'wibble': 'wobble'}, an_extra_param='param_value',
+            diocese_id=123,
+            search_params={'wibble': 'wobble'},
+            an_extra_param='param_value',
         )
 
         expected_result = {
-            'api_id': 'test_api_id', 'data': encode_search_params_return,
-            'sig': generate_signature_return, 'an_extra_param': 'param_value',
+            'api_id': 'test_api_id',
+            'data': encode_search_params_return,
+            'sig': generate_signature_return,
+            'an_extra_param': 'param_value',
         }
         self.assertEqual(result, expected_result)
         self.cofecms._prepare_search_params.assert_called_once_with(
-            diocese_id=123, wibble='wobble',
+            diocese_id=123,
+            wibble='wobble',
         )
         self.cofecms.generate_signature.assert_called_once_with(
-            encode_search_params_return, an_extra_param='param_value',
+            encode_search_params_return,
+            an_extra_param='param_value',
         )
-        self.cofecms._prepare_basic_params.assert_called_once_with(
-            {'an_extra_param': 'param_value'}
-        )
+        self.cofecms._prepare_basic_params.assert_called_once_with({
+            'an_extra_param': 'param_value'
+        })
 
     def test__prepare_basic_params__remove_nones(self):
         params = {'good': 'good_value', 'none_value': None}
@@ -441,7 +536,9 @@ class CofeCMSTest(TestCase):
         result = self.cofecms._prepare_basic_params(params)
 
         expected_result = {
-            'good': 'good_value', 'start_date': '2017-06-09 22:30', 'end_date': '2017-08-02 09:05',
+            'good': 'good_value',
+            'start_date': '2017-06-09 22:30',
+            'end_date': '2017-08-02 09:05',
         }
         self.assertEqual(result, expected_result)
 
@@ -458,14 +555,13 @@ class CofeCMSTest(TestCase):
 
     def test_encode_search_params(self):
         result = self.cofecms.encode_search_params({'w i"b#b&le': 'w"o\'b&b[l/e'})
-        self.assertEqual(
-            result, '{"w i\\"b#b&le": "w\\"o\'b&b[l/e"}'
-        )
+        self.assertEqual(result, '{"w i\\"b#b&le": "w\\"o\'b&b[l/e"}')
 
     def test_generate_signature(self):
         result = self.cofecms.generate_signature('simple_string_for_test', limit=1)
         self.assertEqual(
-            result, '0247f853074bcfca97e05b5a7889eb612795fd525258cb04aad0ea2e578528e0',
+            result,
+            '0247f853074bcfca97e05b5a7889eb612795fd525258cb04aad0ea2e578528e0',
         )
 
     def test__prepare_search_params(self):
@@ -555,15 +651,16 @@ class CofeCMSResultTest(TestCase):
 
     def test_pages_generator(self):
         with mock.patch(
-            'cofecms.api.CofeCMSResult.total_pages',
-            new_callable=mock.PropertyMock,
+                'cofecms.api.CofeCMSResult.total_pages',
+                new_callable=mock.PropertyMock,
         ) as mock_total_pages:
             mock_total_pages.return_value = 2
 
             cofecms_result = CofeCMSResult([{'a': 'aa'}])
 
             cofecms_result.get_data_for_page = mock.Mock(
-                spec=cofecms_result.get_data_for_page, return_value=[{'b': 'bb'}],
+                spec=cofecms_result.get_data_for_page,
+                return_value=[{'b': 'bb'}],
             )
 
             results = []
@@ -593,8 +690,11 @@ class CofeCMSResultTest(TestCase):
         self.assertEqual(result, mock_result)
 
         mock_api_obj.paged_get.assert_called_once_with(
-            endpoint_url='http://example.com/some_end_point', diocese_id=123,
-            search_params={'keyword': 'smith'}, offset=15, limit=5,
+            endpoint_url='http://example.com/some_end_point',
+            diocese_id=123,
+            search_params={'keyword': 'smith'},
+            offset=15,
+            limit=5,
             fields=['forenames', 'surname'],
         )
 
@@ -608,19 +708,24 @@ class ContactDataTest(TestCase):
         self.assertEqual(contact_data.max_access_level, cofecms.PRIVACY_SETTING_PUBLIC)
 
         contact_data = ContactData(
-            raw_contact_data, max_access_level=cofecms.PRIVACY_SETTING_PRIVATE,
+            raw_contact_data,
+            max_access_level=cofecms.PRIVACY_SETTING_PRIVATE,
         )
         self.assertEqual(contact_data.max_access_level, cofecms.PRIVACY_SETTING_PRIVATE)
 
     def test_get_item__public(self):
         raw_contact_data = {
             'wibble': 'wobble',  # No privacy settings
-            'public': 'a', 'public_privacy_setting': cofecms.PRIVACY_SETTING_PUBLIC,
-            'diocese': 'b', 'diocese_privacy_setting': cofecms.PRIVACY_SETTING_DIOCESE_ONLY,
-            'private': 'c', 'private_privacy_setting': cofecms.PRIVACY_SETTING_PRIVATE,
+            'public': 'a',
+            'public_privacy_setting': cofecms.PRIVACY_SETTING_PUBLIC,
+            'diocese': 'b',
+            'diocese_privacy_setting': cofecms.PRIVACY_SETTING_DIOCESE_ONLY,
+            'private': 'c',
+            'private_privacy_setting': cofecms.PRIVACY_SETTING_PRIVATE,
         }
         contact_data = ContactData(
-            raw_contact_data, max_access_level=cofecms.PRIVACY_SETTING_PUBLIC,
+            raw_contact_data,
+            max_access_level=cofecms.PRIVACY_SETTING_PUBLIC,
         )
 
         self.assertEqual(contact_data['wibble'], 'wobble')
@@ -633,12 +738,16 @@ class ContactDataTest(TestCase):
     def test_get_item__diocese(self):
         raw_contact_data = {
             'wibble': 'wobble',  # No privacy settings
-            'public': 'a', 'public_privacy_setting': cofecms.PRIVACY_SETTING_PUBLIC,
-            'diocese': 'b', 'diocese_privacy_setting': cofecms.PRIVACY_SETTING_DIOCESE_ONLY,
-            'private': 'c', 'private_privacy_setting': cofecms.PRIVACY_SETTING_PRIVATE,
+            'public': 'a',
+            'public_privacy_setting': cofecms.PRIVACY_SETTING_PUBLIC,
+            'diocese': 'b',
+            'diocese_privacy_setting': cofecms.PRIVACY_SETTING_DIOCESE_ONLY,
+            'private': 'c',
+            'private_privacy_setting': cofecms.PRIVACY_SETTING_PRIVATE,
         }
         contact_data = ContactData(
-            raw_contact_data, max_access_level=cofecms.PRIVACY_SETTING_DIOCESE_ONLY,
+            raw_contact_data,
+            max_access_level=cofecms.PRIVACY_SETTING_DIOCESE_ONLY,
         )
 
         self.assertEqual(contact_data['wibble'], 'wobble')
@@ -651,12 +760,16 @@ class ContactDataTest(TestCase):
     def test_get_item__private(self):
         raw_contact_data = {
             'wibble': 'wobble',  # No privacy settings
-            'public': 'a', 'public_privacy_setting': cofecms.PRIVACY_SETTING_PUBLIC,
-            'diocese': 'b', 'diocese_privacy_setting': cofecms.PRIVACY_SETTING_DIOCESE_ONLY,
-            'private': 'c', 'private_privacy_setting': cofecms.PRIVACY_SETTING_PRIVATE,
+            'public': 'a',
+            'public_privacy_setting': cofecms.PRIVACY_SETTING_PUBLIC,
+            'diocese': 'b',
+            'diocese_privacy_setting': cofecms.PRIVACY_SETTING_DIOCESE_ONLY,
+            'private': 'c',
+            'private_privacy_setting': cofecms.PRIVACY_SETTING_PRIVATE,
         }
         contact_data = ContactData(
-            raw_contact_data, max_access_level=cofecms.PRIVACY_SETTING_PRIVATE,
+            raw_contact_data,
+            max_access_level=cofecms.PRIVACY_SETTING_PRIVATE,
         )
 
         self.assertEqual(contact_data['wibble'], 'wobble')

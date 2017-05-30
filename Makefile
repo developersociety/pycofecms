@@ -153,11 +153,11 @@ coverage-clean:
 
 # YAPF
 yapf-lint:
-	yapf_lint_output="`yapf -r -p -d --exclude="*/migrations/*.py" --style .style.yapf cofecms`" && \
+	yapf_lint_output="`yapf -r -p -d --style .style.yapf cofecms tests`" && \
 	if [[ $$yapf_lint_output ]]; then echo -e "$$yapf_lint_output"; exit 1; fi
 
 yapf-format:
-	yapf -r -i -p --exclude="*/migrations/*.py" --style .style.yapf cofecms
+	yapf -r -i -p --style .style.yapf cofecms tests
 
 
 #pipdeptree
