@@ -3,7 +3,7 @@ from cofecms.api import CofeCMS  # noqa
 
 __author__ = 'The Developer Society'
 __email__ = 'studio@dev.ngo'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 PLACE_TYPE_ARCHDEACONRY = cofecms.api.PLACE_TYPE_ARCHDEACONRY
 PLACE_TYPE_BENEFICE = cofecms.api.PLACE_TYPE_BENEFICE
