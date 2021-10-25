@@ -13,4 +13,3 @@ yapf==0.16.1
 bumpversion==0.5.3
 wheel==0.29.0
 Sphinx==1.6.2
-cryptography==1.9
