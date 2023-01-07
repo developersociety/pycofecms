@@ -469,8 +469,12 @@ class CofeCMS(object):
         result.diocese_id = diocese_id
         result.search_params = search_params
         result.basic_params = basic_params
-        result.rate_limit = int(response.headers['X-Rate-Limit'])
-        result.rate_limit_remaining = int(response.headers['X-Rate-Limit-Remaining'])
+        try:
+            result.rate_limit = int(response.headers.get('X-RateLimit-Limit'))
+            result.rate_limit_remaining = int(response.headers.get('X-RateLimit-Remaining'))
+        except:  # noqa:E722
+            result.rate_limit = None
+            result.rate_limit_remaining = None
         return result
 
     def paged_get(self, endpoint_url, diocese_id=None, search_params=None, **basic_params):

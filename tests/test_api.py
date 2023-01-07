@@ -337,8 +337,8 @@ class CofeCMSTest(TestCase):
 
         headers = {
             'X-Total-Count': '678',
-            'X-Rate-Limit': '60',
-            'X-Rate-Limit-Remaining': '59',
+            'X-RateLimit-Limit': '60',
+            'X-RateLimit-Remaining': '59',
         }
         mock_response = mock.Mock(spec=requests.Response)
         mock_response.headers = headers
@@ -385,7 +385,9 @@ class CofeCMSTest(TestCase):
             return_value=request_params,
         )
 
-        headers = {'X-Total-Count': '678', 'X-Rate-Limit': '60', 'X-Rate-Limit-Remaining': '59'}
+        headers = {
+            'X-Total-Count': '678', 'X-RateLimit-Limit': '60', 'X-RateLimit-Remaining': '59'
+        }
         mock_response = mock.Mock(spec=requests.Response)
         mock_response.headers = headers
         mock_response.json.return_value = {'a_list': ['some_value']}
@@ -420,8 +422,8 @@ class CofeCMSTest(TestCase):
         get_return = CofeCMSResult([{'contact': ['id', 'surname']}])
         get_return.headers = {
             'X-Total-Count': '678',
-            'X-Rate-Limit': '60',
-            'X-Rate-Limit-Remaining': '59',
+            'X-RateLimit-Limit': '60',
+            'X-RateLimit-Remaining': '59',
         }
         get_return.basic_params = {'limit': 100, 'offset': 0}
         self.cofecms.get = mock.Mock(spec=self.cofecms.get, return_value=get_return)
@@ -446,8 +448,8 @@ class CofeCMSTest(TestCase):
         get_return = CofeCMSResult([{'contact': ['id', 'surname']}])
         get_return.headers = {
             'X-Total-Count': '678',
-            'X-Rate-Limit': '60',
-            'X-Rate-Limit-Remaining': '59',
+            'X-RateLimit-Limit': '60',
+            'X-RateLimit-Remaining': '59',
         }
         get_return.basic_params = {}
         self.cofecms.get = mock.Mock(spec=self.cofecms.get, return_value=get_return)
